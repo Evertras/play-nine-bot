@@ -38,3 +38,11 @@ func TestTwoPlayersHaveDifferentStarts(t *testing.T) {
 	// being the same, but for now that's fine
 	assert.NotElementsMatch(t, p1.CurrentBoard(), p2.CurrentBoard())
 }
+
+func TestNewPlayerIsntFinished(t *testing.T) {
+	d := playnine.NewDeck()
+	p, err := playnine.NewPlayerFromDeck(&d)
+	assert.Nil(t, err)
+
+	assert.False(t, p.IsFinished())
+}
