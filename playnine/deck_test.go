@@ -1,6 +1,7 @@
 package playnine_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/evertras/play-nine-bot/playnine"
@@ -64,5 +65,26 @@ func TestDeckContainsExpectedSpreadOfCards(t *testing.T) {
 
 	for c := range expectedRegularCardTypes {
 		assert.Equal(t, expectedRegularCards, sawCardCount[playnine.Card(c)])
+	}
+}
+
+func TestDrawingFromDeckIsRandomized(t *testing.T) {
+	d := playnine.NewDeck()
+
+	lastSaw := playnine.Card(-1)
+	streakCount := 0
+
+	for range expectedDeckSize {
+		c, err := d.Draw()
+		assert.Nil(t, err)
+
+		if lastSaw == c {
+			streakCount++
+
+			assert.NotEqual(t, 8, streakCount, fmt.Sprintf("Saw 8 in a row of card %d", c))
+		} else {
+			lastSaw = c
+			streakCount = 0
+		}
 	}
 }
