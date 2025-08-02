@@ -11,16 +11,30 @@ const (
 	playerBoardSize = 8
 )
 
-func TestPlayerDrawsFromDeckOnCreation(t *testing.T) {
+var testStrategyFirstTwoOpeningFlips playnine.PlayerStrategyOpeningFlips = func() [2]int {
+	return [2]int{0, 1}
+}
+
+func TestPlayerDrawsFromDeckOnCreationAndFlipsTwoCards(t *testing.T) {
 	d := playnine.NewDeck()
 
 	assert.Equal(t, d.RemainingCardCount(), expectedDeckSize)
 
-	_, err := playnine.NewPlayerFromDeck(&d)
+	p, err := playnine.NewPlayerFromDeck(&d, testStrategyFirstTwoOpeningFlips, nil)
 
 	assert.Nil(t, err)
 
 	assert.Equal(t, d.RemainingCardCount(), expectedDeckSize-playerBoardSize)
+
+	seenFaceUp := 0
+
+	for _, c := range p.CurrentBoard() {
+		if c.FaceUp {
+			seenFaceUp++
+		}
+	}
+
+	assert.Equal(t, seenFaceUp, 2, "Didn't see two cards face up")
 }
 
 func TestTwoPlayersHaveDifferentStarts(t *testing.T) {
@@ -28,10 +42,10 @@ func TestTwoPlayersHaveDifferentStarts(t *testing.T) {
 
 	assert.Equal(t, d.RemainingCardCount(), expectedDeckSize)
 
-	p1, err := playnine.NewPlayerFromDeck(&d)
+	p1, err := playnine.NewPlayerFromDeck(&d, testStrategyFirstTwoOpeningFlips, nil)
 	assert.Nil(t, err)
 
-	p2, err := playnine.NewPlayerFromDeck(&d)
+	p2, err := playnine.NewPlayerFromDeck(&d, testStrategyFirstTwoOpeningFlips, nil)
 	assert.Nil(t, err)
 
 	// Technically there's an astronomically small chance of these
@@ -41,8 +55,18 @@ func TestTwoPlayersHaveDifferentStarts(t *testing.T) {
 
 func TestNewPlayerIsntFinished(t *testing.T) {
 	d := playnine.NewDeck()
-	p, err := playnine.NewPlayerFromDeck(&d)
+	p, err := playnine.NewPlayerFromDeck(&d, testStrategyFirstTwoOpeningFlips, nil)
 	assert.Nil(t, err)
 
 	assert.False(t, p.IsFinished())
+}
+
+func TestNewPlayerErrorsWhenOpeningFlipsOnlyOneCard(t *testing.T) {
+	d := playnine.NewDeck()
+
+	_, err := playnine.NewPlayerFromDeck(&d, func() [2]int {
+		return [2]int{0, 0}
+	}, nil)
+
+	assert.NotNil(t, err)
 }
