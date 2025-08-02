@@ -9,6 +9,7 @@ import (
 type Card int8
 
 const (
+	// CardHoleInOne is a special card with a value of -5
 	CardHoleInOne = Card(-5)
 )
 
