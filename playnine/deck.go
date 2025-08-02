@@ -5,14 +5,6 @@ import (
 	"math/rand/v2"
 )
 
-// Card is just the value of the card. Possible values are 0-12 and -5.
-type Card int8
-
-const (
-	// CardHoleInOne is a special card with a value of -5
-	CardHoleInOne = Card(-5)
-)
-
 // ErrDeckEmpty indicates the deck is empty.
 var ErrDeckEmpty error = errors.New("deck is empty")
 
