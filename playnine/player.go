@@ -21,25 +21,30 @@ type PlayerStrategyOpeningFlips func() [2]int
 // mutating the underlying game state (for now).
 type PlayerStrategyTakeTurn func(d *Deck)
 
-// Player contains information for a single player in the game
+// Player is a player that has some strategy to play.
 type Player struct {
+	StrategyOpeningFlips PlayerStrategyOpeningFlips
+	StrategyTakeTurn     PlayerStrategyTakeTurn
+}
+
+// PlayerState contains information for a single player in an active game.
+type PlayerState struct {
 	// The board is represented by a 1D array, where the 0-3 are the
 	// top row and 4-7 are the bottom row. TODO: Make this clearer/easier
 	// for strategies to work with, very leaky as-is...
 	board [PlayerBoardSize]PlayerBoardCard
 
-	strategyOpeningFlips PlayerStrategyOpeningFlips
-	strategyTakeTurn     PlayerStrategyTakeTurn
+	strategies Player
 }
 
-// NewPlayerFromDeck draws a starting hand for the player and initializes
+// NewPlayerStateFromDeck draws a starting hand for the player and initializes
 // a board, then executes the opening flip strategy to flip exactly two cards.
 //
 // Returns an error if the deck cannot be drawn from or the opening flip
 // strategy doesn't flip exactly two unique cards.
-func NewPlayerFromDeck(d *Deck, strategyOpeningFlips PlayerStrategyOpeningFlips, strategyTakeTurn PlayerStrategyTakeTurn) (Player, error) {
+func NewPlayerStateFromDeck(d *Deck, strategies Player) (PlayerState, error) {
 	if d == nil {
-		return Player{}, fmt.Errorf("given deck was nil")
+		return PlayerState{}, fmt.Errorf("given deck was nil")
 	}
 
 	board := [PlayerBoardSize]PlayerBoardCard{}
@@ -48,7 +53,7 @@ func NewPlayerFromDeck(d *Deck, strategyOpeningFlips PlayerStrategyOpeningFlips,
 		c, err := d.Draw()
 
 		if err != nil {
-			return Player{}, fmt.Errorf("tried to draw starting board for player: %w", err)
+			return PlayerState{}, fmt.Errorf("tried to draw starting board for player: %w", err)
 		}
 
 		board[i] = PlayerBoardCard{
@@ -56,34 +61,33 @@ func NewPlayerFromDeck(d *Deck, strategyOpeningFlips PlayerStrategyOpeningFlips,
 		}
 	}
 
-	flipIndices := strategyOpeningFlips()
+	flipIndices := strategies.StrategyOpeningFlips()
 
 	if flipIndices[0] == flipIndices[1] {
-		return Player{}, fmt.Errorf("opening flip strategy failed to produce unique card indices to flip, both returned values were %d", flipIndices[0])
+		return PlayerState{}, fmt.Errorf("opening flip strategy failed to produce unique card indices to flip, both returned values were %d", flipIndices[0])
 	}
 
 	for _, i := range flipIndices {
 		if i < 0 || i >= PlayerBoardSize {
-			return Player{}, fmt.Errorf("index to flip was out of range, should be between 0 and 7 but got %d", i)
+			return PlayerState{}, fmt.Errorf("index to flip was out of range, should be between 0 and 7 but got %d", i)
 		}
 
 		board[i].FaceUp = true
 	}
 
-	return Player{
-		board:                board,
-		strategyOpeningFlips: strategyOpeningFlips,
-		strategyTakeTurn:     strategyTakeTurn,
+	return PlayerState{
+		board:      board,
+		strategies: strategies,
 	}, nil
 }
 
 // CurrentBoard returns the player's current board state.
-func (p Player) CurrentBoard() [PlayerBoardSize]PlayerBoardCard {
+func (p PlayerState) CurrentBoard() [PlayerBoardSize]PlayerBoardCard {
 	return p.board
 }
 
 // IsFinished returns true if all the player's cards are face up.
-func (p Player) IsFinished() bool {
+func (p PlayerState) IsFinished() bool {
 	// TODO: optimize this with better internal state tracking
 	for _, c := range p.board {
 		if !c.FaceUp {

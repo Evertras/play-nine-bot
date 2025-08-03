@@ -15,12 +15,16 @@ var testStrategyFirstTwoOpeningFlips playnine.PlayerStrategyOpeningFlips = func(
 	return [2]int{0, 1}
 }
 
+var testStrategiesRepeatable = playnine.Player{
+	StrategyOpeningFlips: testStrategyFirstTwoOpeningFlips,
+}
+
 func TestPlayerDrawsFromDeckOnCreationAndFlipsTwoCards(t *testing.T) {
 	d := playnine.NewDeck()
 
 	assert.Equal(t, d.RemainingCardCount(), expectedDeckSize)
 
-	p, err := playnine.NewPlayerFromDeck(&d, testStrategyFirstTwoOpeningFlips, nil)
+	p, err := playnine.NewPlayerStateFromDeck(&d, testStrategiesRepeatable)
 
 	assert.Nil(t, err)
 
@@ -42,10 +46,10 @@ func TestTwoPlayersHaveDifferentStarts(t *testing.T) {
 
 	assert.Equal(t, d.RemainingCardCount(), expectedDeckSize)
 
-	p1, err := playnine.NewPlayerFromDeck(&d, testStrategyFirstTwoOpeningFlips, nil)
+	p1, err := playnine.NewPlayerStateFromDeck(&d, testStrategiesRepeatable)
 	assert.Nil(t, err)
 
-	p2, err := playnine.NewPlayerFromDeck(&d, testStrategyFirstTwoOpeningFlips, nil)
+	p2, err := playnine.NewPlayerStateFromDeck(&d, testStrategiesRepeatable)
 	assert.Nil(t, err)
 
 	// Technically there's an astronomically small chance of these
@@ -55,7 +59,7 @@ func TestTwoPlayersHaveDifferentStarts(t *testing.T) {
 
 func TestNewPlayerIsntFinished(t *testing.T) {
 	d := playnine.NewDeck()
-	p, err := playnine.NewPlayerFromDeck(&d, testStrategyFirstTwoOpeningFlips, nil)
+	p, err := playnine.NewPlayerStateFromDeck(&d, testStrategiesRepeatable)
 	assert.Nil(t, err)
 
 	assert.False(t, p.IsFinished())
@@ -64,9 +68,11 @@ func TestNewPlayerIsntFinished(t *testing.T) {
 func TestNewPlayerErrorsWhenOpeningFlipsOnlyOneCard(t *testing.T) {
 	d := playnine.NewDeck()
 
-	_, err := playnine.NewPlayerFromDeck(&d, func() [2]int {
-		return [2]int{0, 0}
-	}, nil)
+	_, err := playnine.NewPlayerStateFromDeck(&d, playnine.Player{
+		StrategyOpeningFlips: func() [2]int {
+			return [2]int{0, 0}
+		},
+	})
 
 	assert.NotNil(t, err)
 }
