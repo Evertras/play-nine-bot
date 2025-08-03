@@ -13,6 +13,12 @@ type PlayerBoardCard struct {
 	FaceUp bool
 }
 
+// PlayerBoard is represented by a 1D array, where 0-3 are the
+// top row and 4-7 are the bottom row.
+//
+// TODO: Make this clearer/easier for strategies to work with, very leaky as-is...
+type PlayerBoard [PlayerBoardSize]PlayerBoardCard
+
 // PlayerStrategyOpeningFlips must return two unique indices of the first two
 // cards to flip.
 type PlayerStrategyOpeningFlips func() [2]int
@@ -29,10 +35,7 @@ type Player struct {
 
 // PlayerState contains information for a single player in an active game.
 type PlayerState struct {
-	// The board is represented by a 1D array, where the 0-3 are the
-	// top row and 4-7 are the bottom row. TODO: Make this clearer/easier
-	// for strategies to work with, very leaky as-is...
-	board [PlayerBoardSize]PlayerBoardCard
+	board PlayerBoard
 
 	player *Player
 }
@@ -105,4 +108,11 @@ func (p PlayerState) IsFinished() bool {
 	}
 
 	return true
+}
+
+// scoreFinal returns the total player score with their current board. This
+// includes face down cards and is only intended to be used to tally final
+// scores for the round internally.
+func (p PlayerState) scoreFinal() int {
+	return 0
 }
