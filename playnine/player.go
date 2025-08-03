@@ -23,6 +23,9 @@ type PlayerStrategyTakeTurn func(d *Deck)
 
 // Player contains information for a single player in the game
 type Player struct {
+	// The board is represented by a 1D array, where the 0-3 are the
+	// top row and 4-7 are the bottom row. TODO: Make this clearer/easier
+	// for strategies to work with, very leaky as-is...
 	board [PlayerBoardSize]PlayerBoardCard
 
 	strategyOpeningFlips PlayerStrategyOpeningFlips
