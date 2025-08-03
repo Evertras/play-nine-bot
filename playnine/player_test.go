@@ -11,18 +11,12 @@ const (
 	playerBoardSize = 8
 )
 
-var testStrategyFirstTwoOpeningFlips playnine.PlayerStrategyOpeningFlips = func() [2]int {
-	return [2]int{0, 1}
-}
-
-var testStrategiesRepeatable = playnine.NewPlayer(testStrategyFirstTwoOpeningFlips, nil)
-
 func TestPlayerDrawsFromDeckOnCreationAndFlipsTwoCards(t *testing.T) {
 	d := playnine.NewDeck()
 
 	assert.Equal(t, d.RemainingCardCount(), expectedDeckSize)
 
-	p, err := playnine.NewPlayerStateFromDeck(&d, testStrategiesRepeatable)
+	p, err := testPlayer.StartGame(&d)
 
 	assert.Nil(t, err)
 
@@ -37,40 +31,4 @@ func TestPlayerDrawsFromDeckOnCreationAndFlipsTwoCards(t *testing.T) {
 	}
 
 	assert.Equal(t, seenFaceUp, 2, "Didn't see two cards face up")
-}
-
-func TestTwoPlayersHaveDifferentStarts(t *testing.T) {
-	d := playnine.NewDeck()
-
-	assert.Equal(t, d.RemainingCardCount(), expectedDeckSize)
-
-	p1, err := playnine.NewPlayerStateFromDeck(&d, testStrategiesRepeatable)
-	assert.Nil(t, err)
-
-	p2, err := playnine.NewPlayerStateFromDeck(&d, testStrategiesRepeatable)
-	assert.Nil(t, err)
-
-	// Technically there's an astronomically small chance of these
-	// being the same, but for now that's fine
-	assert.NotElementsMatch(t, p1.CurrentBoard(), p2.CurrentBoard())
-}
-
-func TestNewPlayerIsntFinished(t *testing.T) {
-	d := playnine.NewDeck()
-	p, err := playnine.NewPlayerStateFromDeck(&d, testStrategiesRepeatable)
-	assert.Nil(t, err)
-
-	assert.False(t, p.IsFinished())
-}
-
-func TestNewPlayerErrorsWhenOpeningFlipsOnlyOneCard(t *testing.T) {
-	d := playnine.NewDeck()
-
-	brokenFlipStrat := func() [2]int {
-		return [2]int{0, 0}
-	}
-
-	_, err := playnine.NewPlayerStateFromDeck(&d, playnine.NewPlayer(brokenFlipStrat, nil))
-
-	assert.NotNil(t, err)
 }

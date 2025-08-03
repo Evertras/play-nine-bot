@@ -34,7 +34,7 @@ type PlayerState struct {
 	// for strategies to work with, very leaky as-is...
 	board [PlayerBoardSize]PlayerBoardCard
 
-	strategies Player
+	player *Player
 }
 
 // NewPlayer creates a new player with the given strategies that can be used to
@@ -46,12 +46,12 @@ func NewPlayer(strategyOpeningFlips PlayerStrategyOpeningFlips, strategyTakeTurn
 	}
 }
 
-// NewPlayerStateFromDeck draws a starting hand for the player and initializes
+// StartGame draws a starting hand for the player and initializes
 // a board, then executes the opening flip strategy to flip exactly two cards.
 //
 // Returns an error if the deck cannot be drawn from or the opening flip
 // strategy doesn't flip exactly two unique cards.
-func NewPlayerStateFromDeck(d *Deck, strategies Player) (PlayerState, error) {
+func (p *Player) StartGame(d *Deck) (PlayerState, error) {
 	if d == nil {
 		return PlayerState{}, fmt.Errorf("given deck was nil")
 	}
@@ -70,7 +70,7 @@ func NewPlayerStateFromDeck(d *Deck, strategies Player) (PlayerState, error) {
 		}
 	}
 
-	flipIndices := strategies.strategyOpeningFlips()
+	flipIndices := p.strategyOpeningFlips()
 
 	if flipIndices[0] == flipIndices[1] {
 		return PlayerState{}, fmt.Errorf("opening flip strategy failed to produce unique card indices to flip, both returned values were %d", flipIndices[0])
@@ -85,8 +85,8 @@ func NewPlayerStateFromDeck(d *Deck, strategies Player) (PlayerState, error) {
 	}
 
 	return PlayerState{
-		board:      board,
-		strategies: strategies,
+		board:  board,
+		player: p,
 	}, nil
 }
 
