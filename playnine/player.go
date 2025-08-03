@@ -113,6 +113,40 @@ func (p PlayerState) IsFinished() bool {
 // scoreFinal returns the total player score with their current board. This
 // includes face down cards and is only intended to be used to tally final
 // scores for the round internally.
-func (p PlayerState) scoreFinal() int {
-	return 0
+func (p PlayerBoard) scoreFinal() int {
+	const halfBoard = PlayerBoardSize / 2
+	total := 0
+
+	// card value -> how many matched pairs
+	matchCount := make(map[int]int)
+
+	for i := range halfBoard {
+		upperCard := int(p[i].Card)
+		lowerCard := int(p[i+halfBoard].Card)
+
+		if upperCard == lowerCard {
+			matchCount[upperCard] += 1
+
+			// Still count the hole in ones (-5) in the total below
+			if upperCard > 0 {
+				continue
+			}
+		}
+
+		total += upperCard + lowerCard
+	}
+
+	for _, count := range matchCount {
+		// only care about >1
+		switch count {
+		case 2:
+			total -= 10
+		case 3:
+			total -= 15
+		case 4:
+			total -= 20
+		}
+	}
+
+	return total
 }
