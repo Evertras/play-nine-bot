@@ -15,9 +15,7 @@ var testStrategyFirstTwoOpeningFlips playnine.PlayerStrategyOpeningFlips = func(
 	return [2]int{0, 1}
 }
 
-var testStrategiesRepeatable = playnine.Player{
-	StrategyOpeningFlips: testStrategyFirstTwoOpeningFlips,
-}
+var testStrategiesRepeatable = playnine.NewPlayer(testStrategyFirstTwoOpeningFlips, nil)
 
 func TestPlayerDrawsFromDeckOnCreationAndFlipsTwoCards(t *testing.T) {
 	d := playnine.NewDeck()
@@ -68,11 +66,11 @@ func TestNewPlayerIsntFinished(t *testing.T) {
 func TestNewPlayerErrorsWhenOpeningFlipsOnlyOneCard(t *testing.T) {
 	d := playnine.NewDeck()
 
-	_, err := playnine.NewPlayerStateFromDeck(&d, playnine.Player{
-		StrategyOpeningFlips: func() [2]int {
-			return [2]int{0, 0}
-		},
-	})
+	brokenFlipStrat := func() [2]int {
+		return [2]int{0, 0}
+	}
+
+	_, err := playnine.NewPlayerStateFromDeck(&d, playnine.NewPlayer(brokenFlipStrat, nil))
 
 	assert.NotNil(t, err)
 }

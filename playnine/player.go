@@ -23,8 +23,8 @@ type PlayerStrategyTakeTurn func(d *Deck)
 
 // Player is a player that has some strategy to play.
 type Player struct {
-	StrategyOpeningFlips PlayerStrategyOpeningFlips
-	StrategyTakeTurn     PlayerStrategyTakeTurn
+	strategyOpeningFlips PlayerStrategyOpeningFlips
+	strategyTakeTurn     PlayerStrategyTakeTurn
 }
 
 // PlayerState contains information for a single player in an active game.
@@ -35,6 +35,15 @@ type PlayerState struct {
 	board [PlayerBoardSize]PlayerBoardCard
 
 	strategies Player
+}
+
+// NewPlayer creates a new player with the given strategies that can be used to
+// play the game.
+func NewPlayer(strategyOpeningFlips PlayerStrategyOpeningFlips, strategyTakeTurn PlayerStrategyTakeTurn) Player {
+	return Player{
+		strategyOpeningFlips: strategyOpeningFlips,
+		strategyTakeTurn:     strategyTakeTurn,
+	}
 }
 
 // NewPlayerStateFromDeck draws a starting hand for the player and initializes
@@ -61,7 +70,7 @@ func NewPlayerStateFromDeck(d *Deck, strategies Player) (PlayerState, error) {
 		}
 	}
 
-	flipIndices := strategies.StrategyOpeningFlips()
+	flipIndices := strategies.strategyOpeningFlips()
 
 	if flipIndices[0] == flipIndices[1] {
 		return PlayerState{}, fmt.Errorf("opening flip strategy failed to produce unique card indices to flip, both returned values were %d", flipIndices[0])
