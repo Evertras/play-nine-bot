@@ -49,6 +49,23 @@ func NewPlayer(strategyOpeningFlips PlayerStrategyOpeningFlips, strategyTakeTurn
 	}
 }
 
+// CurrentBoard returns the player's current board state.
+func (p PlayerState) CurrentBoard() [PlayerBoardSize]PlayerBoardCard {
+	return p.board
+}
+
+// IsFinished returns true if all the player's cards are face up.
+func (p PlayerState) IsFinished() bool {
+	// TODO: optimize this with better internal state tracking
+	for _, c := range p.board {
+		if !c.FaceUp {
+			return false
+		}
+	}
+
+	return true
+}
+
 // startGame draws a starting hand for the player and initializes
 // a board, then executes the opening flip strategy to flip exactly two cards.
 //
@@ -91,23 +108,6 @@ func (p *Player) startGame(d *Deck) (PlayerState, error) {
 		board:  board,
 		player: p,
 	}, nil
-}
-
-// CurrentBoard returns the player's current board state.
-func (p PlayerState) CurrentBoard() [PlayerBoardSize]PlayerBoardCard {
-	return p.board
-}
-
-// IsFinished returns true if all the player's cards are face up.
-func (p PlayerState) IsFinished() bool {
-	// TODO: optimize this with better internal state tracking
-	for _, c := range p.board {
-		if !c.FaceUp {
-			return false
-		}
-	}
-
-	return true
 }
 
 // scoreFinal returns the total player score with their current board. This
