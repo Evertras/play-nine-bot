@@ -104,6 +104,54 @@ func (p *Player) startGame(d *Deck) (PlayerState, error) {
 	}, nil
 }
 
+// ScoreVisible returns the visible score for face up cards.
+func (p PlayerBoard) ScoreVisible() int {
+	const halfBoard = PlayerBoardSize / 2
+	total := 0
+
+	// card value -> how many matched pairs
+	matchCount := make(map[int]int)
+
+	for i := range halfBoard {
+		upperCard := p[i]
+		lowerCard := p[i+halfBoard]
+
+		upperCardValue := int(upperCard.Card)
+		lowerCardValue := int(lowerCard.Card)
+
+		if upperCardValue == lowerCardValue && upperCard.FaceUp && lowerCard.FaceUp {
+			matchCount[upperCardValue] += 1
+
+			// Still count the hole in ones (-5) in the total below
+			if upperCardValue > 0 {
+				continue
+			}
+		}
+
+		if upperCard.FaceUp {
+			total += upperCardValue
+		}
+
+		if lowerCard.FaceUp {
+			total += lowerCardValue
+		}
+	}
+
+	for _, count := range matchCount {
+		// only care about >1
+		switch count {
+		case 2:
+			total -= 10
+		case 3:
+			total -= 15
+		case 4:
+			total -= 20
+		}
+	}
+
+	return total
+}
+
 // scoreFinal returns the total player score with their current board. This
 // includes face down cards and is only intended to be used to tally final
 // scores for the round internally.

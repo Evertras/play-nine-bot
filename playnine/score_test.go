@@ -8,9 +8,11 @@ import (
 
 func TestScoreCalculations(t *testing.T) {
 	testCases := []struct {
-		name       string
-		cardValues []int
-		score      int
+		name         string
+		cardValues   []int
+		cardFaceUp   []bool
+		scoreFinal   int
+		scoreVisible int
 	}{
 		{
 			name: "all different",
@@ -18,23 +20,51 @@ func TestScoreCalculations(t *testing.T) {
 				1, 2, 3, 4,
 				5, 6, 7, 8,
 			},
-			score: 36,
+			cardFaceUp: []bool{
+				true, true, true, true,
+				false, false, false, false,
+			},
+			scoreFinal:   36,
+			scoreVisible: 10,
 		},
 		{
-			name: "one match",
+			name: "one match visible",
 			cardValues: []int{
 				1, 2, 3, 4,
 				1, 6, 7, 8,
 			},
-			score: 30,
+			cardFaceUp: []bool{
+				true, false, false, true,
+				true, false, false, true,
+			},
+			scoreFinal:   30,
+			scoreVisible: 12,
 		},
 		{
-			name: "two different matches",
+			name: "one match hidden",
+			cardValues: []int{
+				1, 2, 3, 4,
+				1, 6, 7, 8,
+			},
+			cardFaceUp: []bool{
+				true, true, true, true,
+				false, true, true, true,
+			},
+			scoreFinal:   30,
+			scoreVisible: 31,
+		},
+		{
+			name: "two different matches visible",
 			cardValues: []int{
 				1, 2, 3, 4,
 				1, 6, 7, 4,
 			},
-			score: 18,
+			cardFaceUp: []bool{
+				true, true, false, true,
+				true, false, true, true,
+			},
+			scoreFinal:   18,
+			scoreVisible: 9,
 		},
 		{
 			name: "two identical matches for negative score",
@@ -42,7 +72,12 @@ func TestScoreCalculations(t *testing.T) {
 				1, 2, 4, 4,
 				2, 1, 4, 4,
 			},
-			score: -4,
+			cardFaceUp: []bool{
+				true, true, true, true,
+				false, false, false, true,
+			},
+			scoreFinal:   -4,
+			scoreVisible: 7,
 		},
 		{
 			name: "matched hole in ones don't negate them",
@@ -50,7 +85,12 @@ func TestScoreCalculations(t *testing.T) {
 				1, 2, -5, 4,
 				2, 1, -5, 5,
 			},
-			score: 5,
+			cardFaceUp: []bool{
+				true, true, true, true,
+				true, true, true, true,
+			},
+			scoreFinal:   5,
+			scoreVisible: 5,
 		},
 	}
 
@@ -62,9 +102,15 @@ func TestScoreCalculations(t *testing.T) {
 				board[i].Card = Card(val)
 			}
 
-			calculatedScore := board.scoreFinal()
+			for i, faceUp := range c.cardFaceUp {
+				board[i].FaceUp = faceUp
+			}
 
-			assert.Equal(t, c.score, calculatedScore)
+			calculatedScoreFinal := board.scoreFinal()
+			assert.Equal(t, c.scoreFinal, calculatedScoreFinal)
+
+			calculatedScoreVisible := board.ScoreVisible()
+			assert.Equal(t, c.scoreVisible, calculatedScoreVisible)
 		})
 	}
 }
