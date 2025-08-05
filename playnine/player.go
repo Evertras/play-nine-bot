@@ -21,6 +21,8 @@ type PlayerBoard [PlayerBoardSize]PlayerBoardCard
 
 // Player is a player that has some strategy to play.
 type Player struct {
+	name string
+
 	strategyOpeningFlips             PlayerStrategyOpeningFlips
 	strategyTakeTurnDrawOrUseDiscard PlayerStrategyTakeTurnDrawOrUseDiscard
 	strategyTakeTurnDrawn            PlayerStrategyTakeTurnDrawn
@@ -35,8 +37,10 @@ type PlayerState struct {
 
 // NewPlayer creates a new player with the given strategies that can be used to
 // play the game.
-func NewPlayer(strategyOpeningFlips PlayerStrategyOpeningFlips, strategyTakeTurnDrawOrUseDiscard PlayerStrategyTakeTurnDrawOrUseDiscard, strategyTakeTurnDrawn PlayerStrategyTakeTurnDrawn) Player {
+func NewPlayer(name string, strategyOpeningFlips PlayerStrategyOpeningFlips, strategyTakeTurnDrawOrUseDiscard PlayerStrategyTakeTurnDrawOrUseDiscard, strategyTakeTurnDrawn PlayerStrategyTakeTurnDrawn) Player {
 	return Player{
+		name: name,
+
 		strategyOpeningFlips:             strategyOpeningFlips,
 		strategyTakeTurnDrawOrUseDiscard: strategyTakeTurnDrawOrUseDiscard,
 		strategyTakeTurnDrawn:            strategyTakeTurnDrawn,

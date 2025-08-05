@@ -17,8 +17,9 @@ type model struct {
 func newGame() playnine.Game {
 	const numPlayers = 4
 
-	makePlayer := func() playnine.Player {
+	makePlayer := func(i int) playnine.Player {
 		return playnine.NewPlayer(
+			fmt.Sprintf("Player #%d", i),
 			strategies.OpeningFlipsOppositeCorners,
 			strategies.FastestDrawOrUseDiscard,
 			strategies.FastestDrawn,
@@ -27,8 +28,8 @@ func newGame() playnine.Game {
 
 	players := []playnine.Player{}
 
-	for range numPlayers {
-		players = append(players, makePlayer())
+	for i := range numPlayers {
+		players = append(players, makePlayer(i))
 	}
 
 	game, err := playnine.NewGame(players)
