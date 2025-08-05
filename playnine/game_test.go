@@ -20,10 +20,53 @@ func TestNewGameStartsOnRoundOne(t *testing.T) {
 }
 
 func TestNewGameStartsWithFlippedCards(t *testing.T) {
-	players := []playnine.Player{}
+	const numPlayers = 4
 
-	_, err := playnine.NewGame(players)
+	players := make([]playnine.Player, numPlayers)
+
+	for i := range numPlayers {
+		players[i] = playnine.NewPlayer(testStrategyFirstTwoOpeningFlips, nil)
+	}
+
+	g, err := playnine.NewGame(players)
 	assert.Nil(t, err)
+
+	states := g.PlayerStates()
+	assert.Len(t, states, numPlayers, "Unexpected number of player states returned")
+
+	for i, state := range states {
+		numFlipped := 0
+		for _, card := range state.CurrentBoard() {
+			if card.FaceUp {
+				numFlipped++
+			}
+		}
+
+		assert.Equal(t, 2, numFlipped, "Player #%d had unexpected number of flipped cards", i+1)
+	}
+}
+
+func TestNewGameHasRandomizedDiscard(t *testing.T) {
+	const runCount = 100
+
+	players := []playnine.Player{testPlayer}
+
+	sawNonZeroCount := 0
+
+	// The chances of getting a 0 card this many times in a row is hilariously small,
+	// but technically possible... this is fine for now
+	for range runCount {
+		g, err := playnine.NewGame(players)
+		assert.Nil(t, err)
+
+		card := g.AvailableDiscard()
+
+		if card != 0 {
+			return
+		}
+	}
+
+	t.Errorf("didn't see a non-zero discard after %d runs, unlikely to be randomized", sawNonZeroCount)
 }
 
 func TestNewGameErrorsWhenOpeningStrategyFlipsOnlyOneCard(t *testing.T) {

@@ -9,9 +9,11 @@ const TotalRounds = 9
 // each player's turn.
 type Game struct {
 	deck            *Deck
+	discarded       Card
 	players         []Player
 	playerStates    []PlayerState
 	playerTurnIndex int
+	finalTurn       bool
 
 	round int
 }
@@ -32,8 +34,14 @@ func NewGame(players []Player) (Game, error) {
 		playerStates[i] = state
 	}
 
+	discarded, err := d.Draw()
+	if err != nil {
+		return Game{}, fmt.Errorf("failed to draw for discard: %w", err)
+	}
+
 	return Game{
 		deck:            &d,
+		discarded:       discarded,
 		players:         players,
 		playerTurnIndex: 0,
 		playerStates:    playerStates,
@@ -51,4 +59,8 @@ func (g Game) CurrentRound() int {
 // PlayerStates gets the current round's player states.
 func (g Game) PlayerStates() []PlayerState {
 	return g.playerStates
+}
+
+func (g Game) AvailableDiscard() Card {
+	return g.discarded
 }

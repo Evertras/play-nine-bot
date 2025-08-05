@@ -21,3 +21,9 @@ If draw, then decide:
 If take from discard:
 
 - Replace either a face down or face up card on their board
+
+## Known tradeoff decisions
+
+There are a bunch of tests in here that are technically flakey because they're
+checking for randomness in seeds that change on each run. I'm being a little
+lazy about passing custom seeds around and priming tests better that way.
