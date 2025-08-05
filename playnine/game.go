@@ -77,3 +77,14 @@ func (g Game) CurrentPlayerState() PlayerState {
 func (g Game) AvailableDiscard() Card {
 	return g.discarded
 }
+
+// TakeTurn takes the turn for the current player and advances to the next player.
+func (g *Game) TakeTurn() error {
+	g.playerTurnIndex++
+
+	if g.playerTurnIndex >= len(g.players) {
+		g.playerTurnIndex = 0
+	}
+
+	return nil
+}

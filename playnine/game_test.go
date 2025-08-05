@@ -1,17 +1,40 @@
 package playnine_test
 
 import (
+	"fmt"
 	"testing"
 
-	"github.com/evertras/play-nine-bot/playnine"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/evertras/play-nine-bot/playnine"
 )
 
 var testStrategyFirstTwoOpeningFlips playnine.PlayerStrategyOpeningFlips = func() [2]int {
 	return [2]int{0, 1}
 }
 
-var testPlayer = playnine.NewPlayer(testStrategyFirstTwoOpeningFlips, nil, nil)
+var testStrategyDrawOrDiscard playnine.PlayerStrategyTakeTurnDrawOrUseDiscard = func(playnine.Game) (playnine.DecisionDrawOrUseDiscard, playnine.DecisionCardIndex, error) {
+	return playnine.DecisionDrawOrUseDiscardDraw, 0, nil
+}
+
+var testStrategyDrawn playnine.PlayerStrategyTakeTurnDrawn = func(g playnine.Game) (playnine.DecisionDrawn, playnine.DecisionCardIndex, error) {
+	// The strategy is dumb and simple: ignore everything and just flip cards
+	state := g.CurrentPlayerState()
+
+	for index, card := range state.CurrentBoard() {
+		if !card.FaceUp {
+			return playnine.DecisionDrawnDiscardAndFlip, playnine.DecisionCardIndex(index), nil
+		}
+	}
+
+	return 0, 0, fmt.Errorf("didn't find a face down card to flip")
+}
+
+var testPlayer = playnine.NewPlayer(
+	testStrategyFirstTwoOpeningFlips,
+	testStrategyDrawOrDiscard,
+	testStrategyDrawn,
+)
 
 func TestNewGameStartsOnRoundOne(t *testing.T) {
 	g, err := playnine.NewGame(nil)
@@ -120,4 +143,31 @@ func TestGetCurrentPlayerState(t *testing.T) {
 	currentStateByIndex := g.PlayerStates()[g.CurrentPlayerIndex()]
 
 	assert.Equal(t, currentStateByIndex, currentState)
+}
+
+func TestTakingTurnAdvancesToNextPlayer(t *testing.T) {
+	players := []playnine.Player{
+		testPlayer,
+		testPlayer,
+		testPlayer,
+	}
+
+	g, err := playnine.NewGame(players)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, g.CurrentPlayerIndex(), "Should start at player index 0")
+
+	err = g.TakeTurn()
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, g.CurrentPlayerIndex(), "Should be at player index 1 after the first turn")
+
+	err = g.TakeTurn()
+	assert.Nil(t, err)
+
+	assert.Equal(t, 2, g.CurrentPlayerIndex(), "Should be at player index 2 after the second turn")
+
+	err = g.TakeTurn()
+	assert.Nil(t, err)
+
+	assert.Equal(t, 0, g.CurrentPlayerIndex(), "Should be at player index 0 again after the third turn")
 }
