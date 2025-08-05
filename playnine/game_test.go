@@ -156,18 +156,44 @@ func TestTakingTurnAdvancesToNextPlayer(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 0, g.CurrentPlayerIndex(), "Should start at player index 0")
 
-	err = g.TakeTurn()
-	assert.Nil(t, err)
+	turn := func() {
+		err := g.TakeTurn()
+		assert.Nil(t, err, "Failed to take turn")
+	}
 
+	turn()
 	assert.Equal(t, 1, g.CurrentPlayerIndex(), "Should be at player index 1 after the first turn")
 
-	err = g.TakeTurn()
-	assert.Nil(t, err)
-
+	turn()
 	assert.Equal(t, 2, g.CurrentPlayerIndex(), "Should be at player index 2 after the second turn")
 
-	err = g.TakeTurn()
-	assert.Nil(t, err)
-
+	turn()
 	assert.Equal(t, 0, g.CurrentPlayerIndex(), "Should be at player index 0 again after the third turn")
+}
+
+func TestTakingTurnAppliesTurnStrategy(t *testing.T) {
+	players := []playnine.Player{
+		testPlayer,
+		testPlayer,
+		testPlayer,
+	}
+
+	g, err := playnine.NewGame(players)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, g.CurrentPlayerIndex(), "Should start at player index 0")
+
+	turn := func() {
+		err := g.TakeTurn()
+		assert.Nil(t, err, "Failed to take turn")
+	}
+
+	oldState := playnine.PlayerBoard{}
+
+	for i, s := range g.PlayerStates()[0].CurrentBoard() {
+		oldState[i] = s
+	}
+
+	turn()
+
+	assert.NotElementsMatch(t, oldState, g.PlayerStates()[0].CurrentBoard(), "State didn't update, but should've")
 }

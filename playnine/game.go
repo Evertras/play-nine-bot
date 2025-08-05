@@ -80,6 +80,80 @@ func (g Game) AvailableDiscard() Card {
 
 // TakeTurn takes the turn for the current player and advances to the next player.
 func (g *Game) TakeTurn() error {
+	// Apply player strategy
+	curPlayer := g.players[g.CurrentPlayerIndex()]
+
+	drawOrUseDiscard, discardIndex, err := curPlayer.strategyTakeTurnDrawOrUseDiscard(*g)
+
+	if err != nil {
+		return fmt.Errorf("failed to choose draw/discard: %w", err)
+	}
+
+	switch drawOrUseDiscard {
+	case DecisionDrawOrUseDiscardDraw:
+		// This is a bit nested, but so be it for now...
+		decisionDrawn, replaceIndex, err := curPlayer.strategyTakeTurnDrawn(*g)
+
+		if err != nil {
+			return fmt.Errorf("failed to choose what to do when drawing: %w", err)
+		}
+
+		drawnCard, err := g.deck.draw()
+
+		if err != nil {
+			return fmt.Errorf("failed to draw card: %w", err)
+		}
+
+		switch decisionDrawn {
+		case DecisionDrawnReplaceCard:
+			if !replaceIndex.valid() {
+				return fmt.Errorf("invalid index to replace: %v", replaceIndex)
+			}
+
+			oldCard := g.playerStates[g.playerTurnIndex].board[replaceIndex].Card
+
+			g.playerStates[g.playerTurnIndex].board[replaceIndex] = PlayerBoardCard{
+				Card:   drawnCard,
+				FaceUp: true,
+			}
+
+			g.discarded = oldCard
+
+		case DecisionDrawnDiscardAndFlip:
+			if !replaceIndex.valid() {
+				return fmt.Errorf("invalid index to replace: %v", replaceIndex)
+			}
+
+			g.playerStates[g.playerTurnIndex].board[replaceIndex].FaceUp = true
+
+			g.discarded = drawnCard
+
+		case DecisionDrawnDiscardAndSkip:
+			// Enforce correctness
+			seenFaceDown := false
+			for _, c := range g.playerStates[g.playerTurnIndex].board {
+				if !c.FaceUp {
+					if seenFaceDown {
+						return fmt.Errorf("can only skip if one card is left face down")
+					}
+
+					seenFaceDown = true
+				}
+			}
+
+		default:
+			return fmt.Errorf("unexpected decision for drawn card: %w", err)
+		}
+
+	case DecisionDrawOrUseDiscardUseDiscard:
+		// TODO: do the thing
+		return fmt.Errorf("will flip %v eventually but not implemented yet", discardIndex)
+
+	default:
+		return fmt.Errorf("unexpected decision to draw or use discard: %v", drawOrUseDiscard)
+	}
+
+	// Advance the turn
 	g.playerTurnIndex++
 
 	if g.playerTurnIndex >= len(g.players) {

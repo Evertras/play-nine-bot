@@ -54,6 +54,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
+
+		case " ":
+			// This isn't really in the spirit of bubble tea's immutability, but close
+			// enough for now... there's so many underlying slices to copy that it's
+			// not worth messing with it atm.
+			m.game.TakeTurn()
 		}
 	}
 
