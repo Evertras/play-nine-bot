@@ -12,7 +12,7 @@ func stringifyBoardState(state playnine.PlayerBoard) string {
 
 	for i, c := range state {
 		if c.FaceUp {
-			b.WriteString(fmt.Sprintf("%2d ", c.Card))
+			fmt.Fprintf(&b, "%2d ", c.Card)
 		} else {
 			b.WriteString(" - ")
 		}
