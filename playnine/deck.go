@@ -47,9 +47,9 @@ func (d *Deck) RemainingCardCount() int {
 	return len(d.cards)
 }
 
-// Draw returns a random card from the deck. Returns ErrDeckEmpty
+// draw returns a random card from the deck. Returns ErrDeckEmpty
 // if no cards remain in the deck.
-func (d *Deck) Draw() (Card, error) {
+func (d *Deck) draw() (Card, error) {
 	l := len(d.cards)
 
 	if l == 0 {

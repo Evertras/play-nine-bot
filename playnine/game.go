@@ -34,7 +34,7 @@ func NewGame(players []Player) (Game, error) {
 		playerStates[i] = state
 	}
 
-	discarded, err := d.Draw()
+	discarded, err := d.draw()
 	if err != nil {
 		return Game{}, fmt.Errorf("failed to draw for discard: %w", err)
 	}

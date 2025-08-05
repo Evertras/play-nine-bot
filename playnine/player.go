@@ -79,7 +79,7 @@ func (p *Player) startGame(d *Deck) (PlayerState, error) {
 	board := [PlayerBoardSize]PlayerBoardCard{}
 
 	for i := range PlayerBoardSize {
-		c, err := d.Draw()
+		c, err := d.draw()
 
 		if err != nil {
 			return PlayerState{}, fmt.Errorf("tried to draw starting board for player: %w", err)
