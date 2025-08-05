@@ -18,7 +18,7 @@ type model struct {
 	game playnine.Game
 }
 
-func initialModel() model {
+func newGame() playnine.Game {
 	makePlayer := func() playnine.Player {
 		return playnine.NewPlayer(
 			strategies.OpeningFlipsOppositeCorners,
@@ -39,8 +39,12 @@ func initialModel() model {
 		panic(err)
 	}
 
+	return game
+}
+
+func initialModel() model {
 	return model{
-		game: game,
+		game: newGame(),
 	}
 }
 
@@ -60,7 +64,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// enough for now... there's so many underlying slices to copy that it's
 			// not worth messing with it atm.
 			m.game.TakeTurn()
+
+		case "r":
+			// Restart the game
+			m.game = newGame()
 		}
+
 	}
 
 	return m, nil
