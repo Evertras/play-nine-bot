@@ -32,15 +32,22 @@ func (m model) View() string {
 		b.WriteRune('\n')
 	}
 
+	fmt.Fprintf(&b, "Discard: %2d", m.game.AvailableDiscard())
+
 	for i, state := range m.game.PlayerStates() {
+		newline()
+		newline()
 		curBoard := state.CurrentBoard()
+		if m.game.CurrentPlayerIndex() == i {
+			b.WriteString("> ")
+		} else {
+			b.WriteString("  ")
+		}
 		fmt.Fprintf(&b, "Player #%d", i+1)
 		newline()
 		b.WriteString(stringifyBoardState(curBoard))
 		newline()
 		fmt.Fprintf(&b, "Score: %d", curBoard.ScoreVisible())
-		newline()
-		newline()
 	}
 
 	return b.String()
