@@ -15,6 +15,8 @@ type model struct {
 }
 
 func newGame() playnine.Game {
+	const numPlayers = 4
+
 	makePlayer := func() playnine.Player {
 		return playnine.NewPlayer(
 			strategies.OpeningFlipsOppositeCorners,
@@ -25,7 +27,7 @@ func newGame() playnine.Game {
 
 	players := []playnine.Player{}
 
-	for range 4 {
+	for range numPlayers {
 		players = append(players, makePlayer())
 	}
 
