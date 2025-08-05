@@ -33,10 +33,11 @@ func (m model) View() string {
 	}
 
 	for _, state := range m.game.PlayerStates() {
+		curBoard := state.CurrentBoard()
 		newline()
-		b.WriteString(stringifyBoardState(state.CurrentBoard()))
+		b.WriteString(stringifyBoardState(curBoard))
 		newline()
-		fmt.Fprintf(&b, "Visible score: %d", state.CurrentBoard().ScoreVisible())
+		fmt.Fprintf(&b, "Visible score: %d", curBoard.ScoreVisible())
 		newline()
 	}
 
