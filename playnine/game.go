@@ -67,6 +67,12 @@ func (g Game) PlayerStates() []PlayerState {
 	return g.playerStates
 }
 
+// CurrentPlayerState returns the current player's state, as a shortcut for
+// finding the current player's index.
+func (g Game) CurrentPlayerState() PlayerState {
+	return g.playerStates[g.CurrentPlayerIndex()]
+}
+
 // AvailableDiscard returns the card that's available for choosing to discard.
 func (g Game) AvailableDiscard() Card {
 	return g.discarded

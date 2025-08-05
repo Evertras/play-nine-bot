@@ -106,3 +106,18 @@ func TestTwoPlayersHaveDifferentStarts(t *testing.T) {
 	assert.Len(t, states, 2)
 	assert.NotElementsMatch(t, states[0].CurrentBoard(), states[1].CurrentBoard())
 }
+
+func TestGetCurrentPlayerState(t *testing.T) {
+	players := []playnine.Player{
+		testPlayer,
+		testPlayer,
+	}
+
+	g, err := playnine.NewGame(players)
+	assert.Nil(t, err)
+
+	currentState := g.CurrentPlayerState()
+	currentStateByIndex := g.PlayerStates()[g.CurrentPlayerIndex()]
+
+	assert.Equal(t, currentStateByIndex, currentState)
+}
