@@ -71,8 +71,7 @@ func TestNewGameStartsWithFlippedCards(t *testing.T) {
 }
 
 func TestNewGameHasRandomizedDiscard(t *testing.T) {
-	// Max runs, not total runs
-	const runCount = 10000
+	const maxRunCount = 10000
 
 	players := []playnine.Player{testPlayer}
 
@@ -80,7 +79,7 @@ func TestNewGameHasRandomizedDiscard(t *testing.T) {
 
 	// The chances of getting a 0 card this many times in a row is hilariously small,
 	// but technically possible... this is fine for now
-	for range runCount {
+	for range maxRunCount {
 		g, err := playnine.NewGame(players)
 		assert.Nil(t, err)
 
