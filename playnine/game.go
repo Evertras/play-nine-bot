@@ -56,11 +56,18 @@ func (g Game) CurrentRound() int {
 	return g.round
 }
 
+// CurrentPlayerIndex returns the current player's index so a player strategy
+// can know who they are. 0-indexed.
+func (g Game) CurrentPlayerIndex() int {
+	return g.playerTurnIndex
+}
+
 // PlayerStates gets the current round's player states.
 func (g Game) PlayerStates() []PlayerState {
 	return g.playerStates
 }
 
+// AvailableDiscard returns the card that's available for choosing to discard.
 func (g Game) AvailableDiscard() Card {
 	return g.discarded
 }

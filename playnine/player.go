@@ -19,18 +19,11 @@ type PlayerBoardCard struct {
 // TODO: Make this clearer/easier for strategies to work with, very leaky as-is...
 type PlayerBoard [PlayerBoardSize]PlayerBoardCard
 
-// PlayerStrategyOpeningFlips must return two unique indices of the first two
-// cards to flip.
-type PlayerStrategyOpeningFlips func() [2]int
-
-// PlayerStrategyTakeTurn takes in the state of the game and takes a turn,
-// mutating the underlying game state (for now).
-type PlayerStrategyTakeTurn func(d *Deck)
-
 // Player is a player that has some strategy to play.
 type Player struct {
-	strategyOpeningFlips PlayerStrategyOpeningFlips
-	strategyTakeTurn     PlayerStrategyTakeTurn
+	strategyOpeningFlips             PlayerStrategyOpeningFlips
+	strategyTakeTurnDrawOrUseDiscard PlayerStrategyTakeTurnDrawOrUseDiscard
+	strategyTakeTurnDrawn            PlayerStrategyTakeTurnDrawn
 }
 
 // PlayerState contains information for a single player in an active game.
@@ -42,10 +35,11 @@ type PlayerState struct {
 
 // NewPlayer creates a new player with the given strategies that can be used to
 // play the game.
-func NewPlayer(strategyOpeningFlips PlayerStrategyOpeningFlips, strategyTakeTurn PlayerStrategyTakeTurn) Player {
+func NewPlayer(strategyOpeningFlips PlayerStrategyOpeningFlips, strategyTakeTurnDrawOrUseDiscard PlayerStrategyTakeTurnDrawOrUseDiscard, strategyTakeTurnDrawn PlayerStrategyTakeTurnDrawn) Player {
 	return Player{
-		strategyOpeningFlips: strategyOpeningFlips,
-		strategyTakeTurn:     strategyTakeTurn,
+		strategyOpeningFlips:             strategyOpeningFlips,
+		strategyTakeTurnDrawOrUseDiscard: strategyTakeTurnDrawOrUseDiscard,
+		strategyTakeTurnDrawn:            strategyTakeTurnDrawn,
 	}
 }
 

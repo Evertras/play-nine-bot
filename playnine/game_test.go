@@ -11,7 +11,7 @@ var testStrategyFirstTwoOpeningFlips playnine.PlayerStrategyOpeningFlips = func(
 	return [2]int{0, 1}
 }
 
-var testPlayer = playnine.NewPlayer(testStrategyFirstTwoOpeningFlips, nil)
+var testPlayer = playnine.NewPlayer(testStrategyFirstTwoOpeningFlips, nil, nil)
 
 func TestNewGameStartsOnRoundOne(t *testing.T) {
 	g, err := playnine.NewGame(nil)
@@ -25,7 +25,7 @@ func TestNewGameStartsWithFlippedCards(t *testing.T) {
 	players := make([]playnine.Player, numPlayers)
 
 	for i := range numPlayers {
-		players[i] = playnine.NewPlayer(testStrategyFirstTwoOpeningFlips, nil)
+		players[i] = playnine.NewPlayer(testStrategyFirstTwoOpeningFlips, nil, nil)
 	}
 
 	g, err := playnine.NewGame(players)
@@ -75,7 +75,7 @@ func TestNewGameErrorsWhenOpeningStrategyFlipsOnlyOneCard(t *testing.T) {
 		return [2]int{0, 0}
 	}
 
-	player := playnine.NewPlayer(brokenFlipStrat, nil)
+	player := playnine.NewPlayer(brokenFlipStrat, nil, nil)
 
 	_, err := playnine.NewGame([]playnine.Player{player})
 
