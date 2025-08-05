@@ -47,7 +47,8 @@ func TestNewGameStartsWithFlippedCards(t *testing.T) {
 }
 
 func TestNewGameHasRandomizedDiscard(t *testing.T) {
-	const runCount = 100
+	// Max runs, not total runs
+	const runCount = 10000
 
 	players := []playnine.Player{testPlayer}
 
