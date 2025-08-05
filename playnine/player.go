@@ -49,12 +49,12 @@ func NewPlayer(strategyOpeningFlips PlayerStrategyOpeningFlips, strategyTakeTurn
 	}
 }
 
-// StartGame draws a starting hand for the player and initializes
+// startGame draws a starting hand for the player and initializes
 // a board, then executes the opening flip strategy to flip exactly two cards.
 //
 // Returns an error if the deck cannot be drawn from or the opening flip
 // strategy doesn't flip exactly two unique cards.
-func (p *Player) StartGame(d *Deck) (PlayerState, error) {
+func (p *Player) startGame(d *Deck) (PlayerState, error) {
 	if d == nil {
 		return PlayerState{}, fmt.Errorf("given deck was nil")
 	}

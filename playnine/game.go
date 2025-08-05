@@ -25,7 +25,7 @@ func NewGame(players []Player) (Game, error) {
 	playerStates := make([]PlayerState, len(players))
 
 	for i, p := range players {
-		state, err := p.StartGame(&d)
+		state, err := p.startGame(&d)
 
 		if err != nil {
 			return Game{}, fmt.Errorf("failed to create new player state for index %d: %w", i, err)
