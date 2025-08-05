@@ -28,10 +28,16 @@ func stringifyBoardState(state playnine.PlayerBoard) string {
 func (m model) View() string {
 	var b strings.Builder
 
+	newline := func() {
+		b.WriteRune('\n')
+	}
+
 	for _, state := range m.game.PlayerStates() {
-		b.WriteRune('\n')
+		newline()
 		b.WriteString(stringifyBoardState(state.CurrentBoard()))
-		b.WriteRune('\n')
+		newline()
+		fmt.Fprintf(&b, "Visible score: %d", state.CurrentBoard().ScoreVisible())
+		newline()
 	}
 
 	return b.String()
