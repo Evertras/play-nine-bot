@@ -44,7 +44,7 @@ func NewPlayer(strategyOpeningFlips PlayerStrategyOpeningFlips, strategyTakeTurn
 }
 
 // CurrentBoard returns the player's current board state.
-func (p PlayerState) CurrentBoard() [PlayerBoardSize]PlayerBoardCard {
+func (p PlayerState) CurrentBoard() PlayerBoard {
 	return p.board
 }
 
