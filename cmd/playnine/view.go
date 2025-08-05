@@ -37,7 +37,7 @@ func (m model) View() string {
 		newline()
 		b.WriteString(stringifyBoardState(curBoard))
 		newline()
-		fmt.Fprintf(&b, "Visible score: %d", curBoard.ScoreVisible())
+		fmt.Fprintf(&b, "Score: %d", curBoard.ScoreVisible())
 		newline()
 	}
 
