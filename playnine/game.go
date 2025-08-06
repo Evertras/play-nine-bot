@@ -71,6 +71,7 @@ func (g Game) PlayerRoundScores() [][]int {
 	return g.playerRoundScores
 }
 
+// Finished returns true if the game is complete.
 func (g Game) Finished() bool {
 	return g.round == TotalRounds+1
 }
