@@ -13,7 +13,7 @@ type SmartConfig struct {
 	ignoreMatches bool
 }
 
-// returns -1 if no index found, otherwise returns the index
+// returns -1 if no index found, otherwise returns the index to replace
 func smartTryMatch(board playnine.PlayerBoard, consideredCard playnine.Card) int {
 	for i, card := range board {
 		if !card.FaceUp {
@@ -43,6 +43,21 @@ func smartTryMatch(board playnine.PlayerBoard, consideredCard playnine.Card) int
 	return -1
 }
 
+// returns -1 if no inex found, otherwise returns the index to replace
+func smartTryReplaceHighest(board playnine.PlayerBoard, consideredCard playnine.Card) int {
+	for i, card := range board {
+		if !card.FaceUp {
+			continue
+		}
+
+		if card.Card > consideredCard {
+			return i
+		}
+	}
+
+	return -1
+}
+
 func SmartDrawOrUseDiscard(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawOrUseDiscard {
 	return func(g playnine.Game) (playnine.DecisionDrawOrUseDiscard, playnine.DecisionCardIndex, error) {
 		state := g.CurrentPlayerState()
@@ -58,15 +73,11 @@ func SmartDrawOrUseDiscard(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawO
 			}
 		}
 
-		// Check if we can replace any of our face up cards with a lower discard, ignore matches
-		for i, card := range state.CurrentBoard() {
-			if !card.FaceUp {
-				continue
-			}
+		// Check if we can replace any of our face up cards with a lower discard
+		iReplace := smartTryReplaceHighest(board, availDiscard)
 
-			if card.Card > availDiscard {
-				return playnine.DecisionDrawOrUseDiscardUseDiscard, playnine.DecisionCardIndex(i), nil
-			}
+		if iReplace >= 0 {
+			return playnine.DecisionDrawOrUseDiscardUseDiscard, playnine.DecisionCardIndex(iReplace), nil
 		}
 
 		// If the discarded card isn't lower than anything we have, then try our luck with draw
@@ -89,14 +100,9 @@ func SmartDrawn(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawn {
 		}
 
 		// Check if we can replace any of our face up cards with the card we drew, ignore matches
-		for i, card := range state.CurrentBoard() {
-			if !card.FaceUp {
-				continue
-			}
-
-			if card.Card > drawnCard {
-				return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(i), nil
-			}
+		iReplace := smartTryReplaceHighest(board, drawnCard)
+		if iReplace >= 0 {
+			return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(iReplace), nil
 		}
 
 		// Flip whatever the first face down card is
