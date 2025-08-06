@@ -10,7 +10,9 @@ const rowSize = playnine.PlayerBoardSize / 2
 
 type SmartConfig struct {
 	// Defaults should be reasonably expected to be smarter
-	ignoreMatches bool
+
+	// IgnoreMatches will ignore trying to complete matches.
+	IgnoreMatches bool
 }
 
 // returns -1 if no index found, otherwise returns the index to replace
@@ -65,7 +67,7 @@ func SmartDrawOrUseDiscard(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawO
 		availDiscard := g.AvailableDiscard()
 
 		// Check if we can complete any matches, whether the other card is visible or not
-		if !cfg.ignoreMatches {
+		if !cfg.IgnoreMatches {
 			iMatching := smartTryMatch(board, availDiscard)
 
 			if iMatching >= 0 {
@@ -91,7 +93,7 @@ func SmartDrawn(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawn {
 		board := state.CurrentBoard()
 
 		// Check if we can complete any matches, whether the other card is visible or not
-		if !cfg.ignoreMatches {
+		if !cfg.IgnoreMatches {
 			iMatching := smartTryMatch(board, drawnCard)
 
 			if iMatching >= 0 {
