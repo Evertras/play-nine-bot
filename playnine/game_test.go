@@ -209,6 +209,8 @@ func TestRoundScoresUpdateWhenRoundCompletes(t *testing.T) {
 
 	const expectedTurnsToCompleteRound = 2*6 + 1
 
+	assert.Equal(t, 1, g.CurrentRound(), "Should start on the first round")
+
 	for i := range expectedTurnsToCompleteRound {
 		err = g.TakeTurn()
 		assert.Nil(t, err, "Failed to take turn on turn %d", i+1)
