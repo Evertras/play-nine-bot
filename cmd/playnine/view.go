@@ -49,7 +49,7 @@ func renderPlayerBoards(game playnine.Game) string {
 		} else {
 			b.WriteString("  ")
 		}
-		fmt.Fprintf(&b, "Player #%d", i+1)
+		b.WriteString(game.Players()[i].Name())
 		b.WriteRune('\n')
 		b.WriteString(stringifyBoardState(curBoard))
 		b.WriteRune('\n')

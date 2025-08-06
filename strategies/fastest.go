@@ -10,7 +10,7 @@ var FastestDrawOrUseDiscard playnine.PlayerStrategyTakeTurnDrawOrUseDiscard = fu
 	return playnine.DecisionDrawOrUseDiscardDraw, 0, nil
 }
 
-var FastestDrawn playnine.PlayerStrategyTakeTurnDrawn = func(g playnine.Game) (playnine.DecisionDrawn, playnine.DecisionCardIndex, error) {
+var FastestDrawn playnine.PlayerStrategyTakeTurnDrawn = func(g playnine.Game, _ playnine.Card) (playnine.DecisionDrawn, playnine.DecisionCardIndex, error) {
 	// The strategy is dumb and simple: ignore everything and just flip cards
 	state := g.CurrentPlayerState()
 

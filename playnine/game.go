@@ -106,16 +106,16 @@ func (g *Game) TakeTurn() error {
 	switch drawOrUseDiscard {
 	case DecisionDrawOrUseDiscardDraw:
 		// This is a bit nested, but so be it for now...
-		decisionDrawn, replaceIndex, err := curPlayer.strategyTakeTurnDrawn(*g)
-
-		if err != nil {
-			return fmt.Errorf("failed to choose what to do when drawing: %w", err)
-		}
-
 		drawnCard, err := g.deck.draw()
 
 		if err != nil {
 			return fmt.Errorf("failed to draw card: %w", err)
+		}
+
+		decisionDrawn, replaceIndex, err := curPlayer.strategyTakeTurnDrawn(*g, drawnCard)
+
+		if err != nil {
+			return fmt.Errorf("failed to choose what to do when drawing: %w", err)
 		}
 
 		switch decisionDrawn {
@@ -160,8 +160,13 @@ func (g *Game) TakeTurn() error {
 		}
 
 	case DecisionDrawOrUseDiscardUseDiscard:
-		// TODO: do the thing
-		return fmt.Errorf("will flip %v eventually but not implemented yet", discardIndex)
+		if !discardIndex.valid() {
+			return fmt.Errorf("invalid card index to replace with discard: %v", discardIndex)
+		}
+
+		oldCardValue := g.playerStates[g.currentPlayerIndex].board[discardIndex].Card
+		g.playerStates[g.currentPlayerIndex].board[discardIndex].Card = g.AvailableDiscard()
+		g.discarded = oldCardValue
 
 	default:
 		return fmt.Errorf("unexpected decision to draw or use discard: %v", drawOrUseDiscard)

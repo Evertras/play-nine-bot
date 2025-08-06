@@ -17,7 +17,7 @@ var testStrategyDrawOrDiscard playnine.PlayerStrategyTakeTurnDrawOrUseDiscard = 
 	return playnine.DecisionDrawOrUseDiscardDraw, 0, nil
 }
 
-var testStrategyDrawn playnine.PlayerStrategyTakeTurnDrawn = func(g playnine.Game) (playnine.DecisionDrawn, playnine.DecisionCardIndex, error) {
+var testStrategyDrawn playnine.PlayerStrategyTakeTurnDrawn = func(g playnine.Game, _ playnine.Card) (playnine.DecisionDrawn, playnine.DecisionCardIndex, error) {
 	// The strategy is dumb and simple: ignore everything and just flip cards
 	state := g.CurrentPlayerState()
 

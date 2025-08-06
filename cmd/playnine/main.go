@@ -17,19 +17,32 @@ type model struct {
 func newGame() playnine.Game {
 	const numPlayers = 4
 
-	makePlayer := func(i int) playnine.Player {
+	makeFastestPlayer := func(i int) playnine.Player {
 		return playnine.NewPlayer(
-			fmt.Sprintf("Player #%d", i+1),
+			fmt.Sprintf("Fastest #%d", i+1),
 			strategies.OpeningFlipsOppositeCorners,
 			strategies.FastestDrawOrUseDiscard,
 			strategies.FastestDrawn,
 		)
 	}
 
+	makeReplacerPlayer := func(i int) playnine.Player {
+		return playnine.NewPlayer(
+			fmt.Sprintf("Replacer #%d", i+1),
+			strategies.OpeningFlipsOppositeCorners,
+			strategies.ReplaceHighestDrawOrUseDiscard,
+			strategies.ReplaceHighestDrawn,
+		)
+	}
+
 	players := []playnine.Player{}
 
 	for i := range numPlayers {
-		players = append(players, makePlayer(i))
+		if i < numPlayers/2 {
+			players = append(players, makeFastestPlayer(i))
+		} else {
+			players = append(players, makeReplacerPlayer(i))
+		}
 	}
 
 	game, err := playnine.NewGame(players)

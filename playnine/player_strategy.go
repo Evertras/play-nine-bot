@@ -53,4 +53,4 @@ type PlayerStrategyTakeTurnDrawOrUseDiscard func(g Game) (DecisionDrawOrUseDisca
 // PlayerStrategyTakeTurnDrawn takes in the state of the game and returns what
 // decision to make when the prior decision was to draw a card. Must return the
 // chosen card index if replacing or discarding/flipping.
-type PlayerStrategyTakeTurnDrawn func(g Game) (DecisionDrawn, DecisionCardIndex, error)
+type PlayerStrategyTakeTurnDrawn func(g Game, drawnCard Card) (DecisionDrawn, DecisionCardIndex, error)

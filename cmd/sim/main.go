@@ -21,7 +21,7 @@ func main() {
 
 	players := make([]playnine.Player, numPlayers)
 
-	for i := range numPlayers {
+	for i := range numPlayers - 1 {
 		players[i] = playnine.NewPlayer(
 			fmt.Sprintf("Fast #%d", i+1),
 			strategies.OpeningFlipsOppositeCorners,
@@ -29,6 +29,13 @@ func main() {
 			strategies.FastestDrawn,
 		)
 	}
+
+	players[numPlayers-1] = playnine.NewPlayer(
+		"Replacer",
+		strategies.OpeningFlipsOppositeCorners,
+		strategies.ReplaceHighestDrawOrUseDiscard,
+		strategies.ReplaceHighestDrawn,
+	)
 
 	finalScores, err := runMany(players, numRounds)
 
