@@ -35,7 +35,7 @@ var ReplaceHigherDrawn playnine.PlayerStrategyTakeTurnDrawn = func(g playnine.Ga
 		}
 
 		if card.Card > drawnCard {
-			return playnine.DecisionDrawnDiscardAndFlip, playnine.DecisionCardIndex(i), nil
+			return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(i), nil
 		}
 	}
 
