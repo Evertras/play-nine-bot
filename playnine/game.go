@@ -1,9 +1,14 @@
 package playnine
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // TotalRounds is how many rounds are played in total.
 const TotalRounds = 9
+
+var ErrGameAlreadyFinished = errors.New("game is already finished")
 
 // Game represents the state of the game and can advance forward through
 // each player's turn.
@@ -13,7 +18,6 @@ type Game struct {
 	players            []Player
 	playerStates       []PlayerState
 	currentPlayerIndex int
-	finalTurn          bool
 
 	round             int
 	playerRoundScores [][]int
@@ -67,49 +71,16 @@ func (g Game) PlayerRoundScores() [][]int {
 	return g.playerRoundScores
 }
 
-func (g *Game) dealFreshDeck() error {
-	g.deck = NewDeck()
-
-	g.playerStates = make([]PlayerState, len(g.players))
-
-	for i, p := range g.players {
-		state, err := p.startGame(g.deck)
-
-		if err != nil {
-			return fmt.Errorf("failed to create new player state for index %d: %w", i, err)
-		}
-
-		g.playerStates[i] = state
-	}
-
-	var err error
-	g.discarded, err = g.deck.draw()
-	if err != nil {
-		return fmt.Errorf("failed to draw for discard: %w", err)
-	}
-
-	return nil
-}
-
-func (g *Game) advanceRound() error {
-	scores := make([]int, len(g.playerStates))
-
-	for i, p := range g.playerStates {
-		scores[i] = p.board.scoreFinal()
-	}
-
-	g.playerRoundScores = append(g.playerRoundScores, scores)
-
-	// Do this before incrementing round because round is 1-index
-	g.currentPlayerIndex = g.round % len(g.players)
-
-	g.round++
-
-	return g.dealFreshDeck()
+func (g Game) Finished() bool {
+	return g.round == TotalRounds+1
 }
 
 // TakeTurn takes the turn for the current player and advances to the next player.
 func (g *Game) TakeTurn() error {
+	if g.Finished() {
+		return ErrGameAlreadyFinished
+	}
+
 	// If the current player is done then that means we've finished the round,
 	// because everyone else got to go once.
 	if g.CurrentPlayerState().IsFinished() {
@@ -198,4 +169,45 @@ func (g *Game) TakeTurn() error {
 	}
 
 	return nil
+}
+
+func (g *Game) dealFreshDeck() error {
+	g.deck = NewDeck()
+
+	g.playerStates = make([]PlayerState, len(g.players))
+
+	for i, p := range g.players {
+		state, err := p.startGame(g.deck)
+
+		if err != nil {
+			return fmt.Errorf("failed to create new player state for index %d: %w", i, err)
+		}
+
+		g.playerStates[i] = state
+	}
+
+	var err error
+	g.discarded, err = g.deck.draw()
+	if err != nil {
+		return fmt.Errorf("failed to draw for discard: %w", err)
+	}
+
+	return nil
+}
+
+func (g *Game) advanceRound() error {
+	scores := make([]int, len(g.playerStates))
+
+	for i, p := range g.playerStates {
+		scores[i] = p.board.scoreFinal()
+	}
+
+	g.playerRoundScores = append(g.playerRoundScores, scores)
+
+	// Do this before incrementing round because round is 1-index
+	g.currentPlayerIndex = g.round % len(g.players)
+
+	g.round++
+
+	return g.dealFreshDeck()
 }
