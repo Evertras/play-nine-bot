@@ -35,15 +35,22 @@ func newGame() playnine.Game {
 		)
 	}
 
+	makeSmartPlayer := func(i int) playnine.Player {
+		cfg := strategies.SmartConfig{}
+		return playnine.NewPlayer(
+			fmt.Sprintf("Smart #%d", i+1),
+			strategies.OpeningFlipsOppositeCorners,
+			strategies.SmartDrawOrUseDiscard(cfg),
+			strategies.SmartDrawn(cfg),
+		)
+	}
+
 	players := []playnine.Player{}
 
-	for i := range numPlayers {
-		if i < numPlayers/2 {
-			players = append(players, makeFastestPlayer(i))
-		} else {
-			players = append(players, makeReplacerPlayer(i))
-		}
-	}
+	players = append(players, makeFastestPlayer(0))
+	players = append(players, makeFastestPlayer(1))
+	players = append(players, makeReplacerPlayer(2))
+	players = append(players, makeSmartPlayer(3))
 
 	game, err := playnine.NewGame(players)
 

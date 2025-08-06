@@ -19,24 +19,34 @@ func main() {
 		numRounds  = 10000
 	)
 
-	players := make([]playnine.Player, numPlayers)
+	players := make([]playnine.Player, 0, numPlayers)
 
-	for i := range numPlayers - 1 {
-		players[i] = playnine.NewPlayer(
-			fmt.Sprintf("Fast #%d", i+1),
-			strategies.OpeningFlipsOppositeCorners,
-			strategies.FastestDrawOrUseDiscard,
-			strategies.FastestDrawn,
-		)
-	}
-
-	players[numPlayers-1] = playnine.NewPlayer(
-		"Replacer",
+	players = append(players, playnine.NewPlayer(
+		"Fast",
 		strategies.OpeningFlipsOppositeCorners,
-		strategies.ReplaceHighestDrawOrUseDiscard,
-		strategies.ReplaceHighestDrawn,
+		strategies.FastestDrawOrUseDiscard,
+		strategies.FastestDrawn,
+	))
+
+	players = append(players,
+		playnine.NewPlayer(
+			"Replacer",
+			strategies.OpeningFlipsOppositeCorners,
+			strategies.ReplaceHighestDrawOrUseDiscard,
+			strategies.ReplaceHighestDrawn,
+		),
 	)
 
+	smartCfg := strategies.SmartConfig{}
+
+	players = append(players,
+		playnine.NewPlayer(
+			"Smart",
+			strategies.OpeningFlipsOppositeCorners,
+			strategies.SmartDrawOrUseDiscard(smartCfg),
+			strategies.SmartDrawn(smartCfg),
+		),
+	)
 	finalScores, err := runMany(players, numRounds)
 
 	if err != nil {
