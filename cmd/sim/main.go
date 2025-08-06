@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"slices"
 
 	"github.com/evertras/play-nine-bot/playnine"
 	"github.com/evertras/play-nine-bot/strategies"
@@ -34,14 +33,6 @@ func main() {
 		fmt.Println("Failed to run game:", err)
 		os.Exit(1)
 	}
-
-	slices.SortFunc(finalScores, func(a, b result) int {
-		if a.finalScore < b.finalScore {
-			return -1
-		}
-
-		return 1
-	})
 
 	for _, finalScore := range finalScores {
 		fmt.Println(finalScore.player.Name(), " ", finalScore.finalScore)

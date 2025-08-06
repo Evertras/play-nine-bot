@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/evertras/play-nine-bot/playnine"
 )
@@ -35,6 +36,14 @@ func runGame(players []playnine.Player) ([]result, error) {
 			finalScores[i].finalScore += score
 		}
 	}
+
+	slices.SortFunc(finalScores, func(a, b result) int {
+		if a.finalScore < b.finalScore {
+			return -1
+		}
+
+		return 1
+	})
 
 	return finalScores, nil
 }
