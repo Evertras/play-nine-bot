@@ -64,19 +64,49 @@ func renderPlayerBoards(game playnine.Game) string {
 }
 
 func renderPlayerScoreTable(game playnine.Game) string {
+	players := game.Players()
+	numPlayers := len(players)
 	roundScores := game.PlayerRoundScores()
+	numRounds := len(roundScores)
 
-	rows := make([][]string, len(roundScores))
+	// Include a header row
+	numRows := numPlayers + 1
 
-	for round, playerScores := range roundScores {
-		row := make([]string, len(playerScores)+1)
+	// First column is names, last column is total scores
+	numCols := numRounds + 2
 
-		row[0] = fmt.Sprintf("%d ", round+1)
-		for i, score := range playerScores {
-			row[i+1] = fmt.Sprintf("%d", score)
+	// Some more explicit indices to use
+	const (
+		iHeaderRow = 0
+		iNameCol   = 0
+	)
+	iTotalScoreCol := numCols - 1
+
+	rows := make([][]string, numRows)
+
+	// Header text is the number of the round
+	rows[iHeaderRow] = make([]string, numCols)
+	rows[iHeaderRow][iTotalScoreCol] = "Total"
+
+	for i := range numPlayers {
+		rows[i+1] = make([]string, numCols)
+		rows[i+1][iNameCol] = players[i].Name()
+	}
+
+	scoreTotals := make([]int, numPlayers)
+
+	for iRound, playerScores := range roundScores {
+		rows[iHeaderRow][iRound+1] = fmt.Sprintf("%3d", iRound+1)
+
+		for iPlayer, score := range playerScores {
+			rows[iPlayer+1][iRound+1] = fmt.Sprintf("%d", score)
+			scoreTotals[iPlayer] += score
 		}
 
-		rows[round] = row
+	}
+
+	for iPlayer, total := range scoreTotals {
+		rows[iPlayer+1][iTotalScoreCol] = fmt.Sprintf("%d", total)
 	}
 
 	t := table.New().Border(lipgloss.NormalBorder()).Rows(rows...)
