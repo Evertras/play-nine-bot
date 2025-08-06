@@ -110,7 +110,8 @@ func (g *Game) advanceRound() error {
 
 // TakeTurn takes the turn for the current player and advances to the next player.
 func (g *Game) TakeTurn() error {
-	// If the current player is done
+	// If the current player is done then that means we've finished the round,
+	// because everyone else got to go once.
 	if g.CurrentPlayerState().IsFinished() {
 		g.advanceRound()
 
