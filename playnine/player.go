@@ -37,7 +37,12 @@ type PlayerState struct {
 
 // NewPlayer creates a new player with the given strategies that can be used to
 // play the game.
-func NewPlayer(name string, strategyOpeningFlips PlayerStrategyOpeningFlips, strategyTakeTurnDrawOrUseDiscard PlayerStrategyTakeTurnDrawOrUseDiscard, strategyTakeTurnDrawn PlayerStrategyTakeTurnDrawn) Player {
+func NewPlayer(
+	name string,
+	strategyOpeningFlips PlayerStrategyOpeningFlips,
+	strategyTakeTurnDrawOrUseDiscard PlayerStrategyTakeTurnDrawOrUseDiscard,
+	strategyTakeTurnDrawn PlayerStrategyTakeTurnDrawn,
+) Player {
 	return Player{
 		name: name,
 
