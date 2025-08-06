@@ -6,7 +6,7 @@ import (
 	"github.com/evertras/play-nine-bot/playnine"
 )
 
-var ReplaceHighestDrawOrUseDiscard playnine.PlayerStrategyTakeTurnDrawOrUseDiscard = func(g playnine.Game) (playnine.DecisionDrawOrUseDiscard, playnine.DecisionCardIndex, error) {
+var ReplaceHigherDrawOrUseDiscard playnine.PlayerStrategyTakeTurnDrawOrUseDiscard = func(g playnine.Game) (playnine.DecisionDrawOrUseDiscard, playnine.DecisionCardIndex, error) {
 	state := g.CurrentPlayerState()
 	availDiscard := g.AvailableDiscard()
 
@@ -25,7 +25,7 @@ var ReplaceHighestDrawOrUseDiscard playnine.PlayerStrategyTakeTurnDrawOrUseDisca
 	return playnine.DecisionDrawOrUseDiscardDraw, 0, nil
 }
 
-var ReplaceHighestDrawn playnine.PlayerStrategyTakeTurnDrawn = func(g playnine.Game, drawnCard playnine.Card) (playnine.DecisionDrawn, playnine.DecisionCardIndex, error) {
+var ReplaceHigherDrawn playnine.PlayerStrategyTakeTurnDrawn = func(g playnine.Game, drawnCard playnine.Card) (playnine.DecisionDrawn, playnine.DecisionCardIndex, error) {
 	state := g.CurrentPlayerState()
 
 	// Check if we can replace any of our face up cards with the card we drew, ignore matches

@@ -30,8 +30,8 @@ func newGame() playnine.Game {
 		return playnine.NewPlayer(
 			fmt.Sprintf("Replacer #%d", i+1),
 			strategies.OpeningFlipsOppositeCorners,
-			strategies.ReplaceHighestDrawOrUseDiscard,
-			strategies.ReplaceHighestDrawn,
+			strategies.ReplaceHigherDrawOrUseDiscard,
+			strategies.ReplaceHigherDrawn,
 		)
 	}
 

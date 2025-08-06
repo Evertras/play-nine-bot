@@ -32,8 +32,8 @@ func main() {
 		playnine.NewPlayer(
 			"Replacer",
 			strategies.OpeningFlipsOppositeCorners,
-			strategies.ReplaceHighestDrawOrUseDiscard,
-			strategies.ReplaceHighestDrawn,
+			strategies.ReplaceHigherDrawOrUseDiscard,
+			strategies.ReplaceHigherDrawn,
 		),
 	)
 

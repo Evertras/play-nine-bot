@@ -13,6 +13,36 @@ type SmartConfig struct {
 	ignoreMatches bool
 }
 
+// returns -1 if no index found, otherwise returns the index
+func smartTryMatch(board playnine.PlayerBoard, consideredCard playnine.Card) int {
+	for i, card := range board {
+		if !card.FaceUp {
+			continue
+		}
+
+		if card.Card != consideredCard {
+			continue
+		}
+
+		var iMatchingCard int
+
+		if i < rowSize {
+			iMatchingCard = i + rowSize
+		} else {
+			iMatchingCard = i - rowSize
+		}
+
+		// Skip if already a match
+		if board[iMatchingCard].FaceUp && board[iMatchingCard].Card == consideredCard {
+			continue
+		}
+
+		return iMatchingCard
+	}
+
+	return -1
+}
+
 func SmartDrawOrUseDiscard(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawOrUseDiscard {
 	return func(g playnine.Game) (playnine.DecisionDrawOrUseDiscard, playnine.DecisionCardIndex, error) {
 		state := g.CurrentPlayerState()
@@ -21,29 +51,10 @@ func SmartDrawOrUseDiscard(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawO
 
 		// Check if we can complete any matches, whether the other card is visible or not
 		if !cfg.ignoreMatches {
-			for i, card := range board {
-				if !card.FaceUp {
-					continue
-				}
+			iMatching := smartTryMatch(board, availDiscard)
 
-				if card.Card != availDiscard {
-					continue
-				}
-
-				var iMatchingCard int
-
-				if i < rowSize {
-					iMatchingCard = i + rowSize
-				} else {
-					iMatchingCard = i - rowSize
-				}
-
-				// Skip if already a match
-				if board[iMatchingCard].FaceUp && board[iMatchingCard].Card == availDiscard {
-					continue
-				}
-
-				return playnine.DecisionDrawOrUseDiscardUseDiscard, playnine.DecisionCardIndex(iMatchingCard), nil
+			if iMatching >= 0 {
+				return playnine.DecisionDrawOrUseDiscardUseDiscard, playnine.DecisionCardIndex(iMatching), nil
 			}
 		}
 
@@ -70,29 +81,10 @@ func SmartDrawn(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawn {
 
 		// Check if we can complete any matches, whether the other card is visible or not
 		if !cfg.ignoreMatches {
-			for i, card := range board {
-				if !card.FaceUp {
-					continue
-				}
+			iMatching := smartTryMatch(board, drawnCard)
 
-				if card.Card != drawnCard {
-					continue
-				}
-
-				var iMatchingCard int
-
-				if i < rowSize {
-					iMatchingCard = i + rowSize
-				} else {
-					iMatchingCard = i - rowSize
-				}
-
-				// Skip if already a match
-				if board[iMatchingCard].FaceUp && board[iMatchingCard].Card == drawnCard {
-					continue
-				}
-
-				return playnine.DecisionDrawnDiscardAndFlip, playnine.DecisionCardIndex(iMatchingCard), nil
+			if iMatching >= 0 {
+				return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(iMatching), nil
 			}
 		}
 
@@ -103,7 +95,7 @@ func SmartDrawn(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawn {
 			}
 
 			if card.Card > drawnCard {
-				return playnine.DecisionDrawnDiscardAndFlip, playnine.DecisionCardIndex(i), nil
+				return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(i), nil
 			}
 		}
 
