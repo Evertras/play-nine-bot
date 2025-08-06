@@ -71,6 +71,11 @@ func (g Game) PlayerRoundScores() [][]int {
 	return g.playerRoundScores
 }
 
+// Players gets the players that are in the game.
+func (g Game) Players() []Player {
+	return g.players
+}
+
 // Finished returns true if the game is complete.
 func (g Game) Finished() bool {
 	return g.round == TotalRounds+1
