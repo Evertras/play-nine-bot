@@ -1,3 +1,7 @@
+.PHONY: sim
+sim:
+	@go run ./cmd/sim
+
 .PHONY: run
 run:
 	@go run ./cmd/playnine
