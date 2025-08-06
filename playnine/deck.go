@@ -14,7 +14,7 @@ type Deck struct {
 }
 
 // NewDeck returns a new Deck of 108 cards.
-func NewDeck() Deck {
+func NewDeck() *Deck {
 	const (
 		numHoleInOnes       = 4
 		numRegularCards     = 8
@@ -37,7 +37,7 @@ func NewDeck() Deck {
 		}
 	}
 
-	return Deck{
+	return &Deck{
 		cards,
 	}
 }

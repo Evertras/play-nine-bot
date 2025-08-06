@@ -8,12 +8,12 @@ const TotalRounds = 9
 // Game represents the state of the game and can advance forward through
 // each player's turn.
 type Game struct {
-	deck            *Deck
-	discarded       Card
-	players         []Player
-	playerStates    []PlayerState
-	playerTurnIndex int
-	finalTurn       bool
+	deck               *Deck
+	discarded          Card
+	players            []Player
+	playerStates       []PlayerState
+	currentPlayerIndex int
+	finalTurn          bool
 
 	round             int
 	playerRoundScores [][]int
@@ -21,34 +21,15 @@ type Game struct {
 
 // NewGame creates a new game with the given players ready to play.
 func NewGame(players []Player) (Game, error) {
-	d := NewDeck()
-
-	playerStates := make([]PlayerState, len(players))
-
-	for i, p := range players {
-		state, err := p.startGame(&d)
-
-		if err != nil {
-			return Game{}, fmt.Errorf("failed to create new player state for index %d: %w", i, err)
-		}
-
-		playerStates[i] = state
-	}
-
-	discarded, err := d.draw()
-	if err != nil {
-		return Game{}, fmt.Errorf("failed to draw for discard: %w", err)
-	}
-
-	return Game{
-		deck:            &d,
-		discarded:       discarded,
-		players:         players,
-		playerTurnIndex: 0,
-		playerStates:    playerStates,
+	g := Game{
+		players: players,
 
 		round: 1,
-	}, nil
+	}
+
+	err := g.dealFreshDeck()
+
+	return g, err
 }
 
 // CurrentRound returns the current round the game is on,
@@ -60,7 +41,7 @@ func (g Game) CurrentRound() int {
 // CurrentPlayerIndex returns the current player's index so a player strategy
 // can know who they are. 0-indexed.
 func (g Game) CurrentPlayerIndex() int {
-	return g.playerTurnIndex
+	return g.currentPlayerIndex
 }
 
 // PlayerStates gets the current round's player states.
@@ -86,19 +67,52 @@ func (g Game) PlayerRoundScores() [][]int {
 	return g.playerRoundScores
 }
 
+func (g *Game) dealFreshDeck() error {
+	g.deck = NewDeck()
+
+	g.playerStates = make([]PlayerState, len(g.players))
+
+	for i, p := range g.players {
+		state, err := p.startGame(g.deck)
+
+		if err != nil {
+			return fmt.Errorf("failed to create new player state for index %d: %w", i, err)
+		}
+
+		g.playerStates[i] = state
+	}
+
+	var err error
+	g.discarded, err = g.deck.draw()
+	if err != nil {
+		return fmt.Errorf("failed to draw for discard: %w", err)
+	}
+
+	return nil
+}
+
+func (g *Game) advanceRound() error {
+	scores := make([]int, len(g.playerStates))
+
+	for i, p := range g.playerStates {
+		scores[i] = p.board.scoreFinal()
+	}
+
+	g.playerRoundScores = append(g.playerRoundScores, scores)
+
+	// TODO: advance per round, catch with test
+	g.currentPlayerIndex = 0
+
+	g.round++
+
+	return g.dealFreshDeck()
+}
+
 // TakeTurn takes the turn for the current player and advances to the next player.
 func (g *Game) TakeTurn() error {
 	// If the current player is done
 	if g.CurrentPlayerState().IsFinished() {
-		scores := make([]int, len(g.playerStates))
-
-		for i, p := range g.playerStates {
-			scores[i] = p.board.scoreFinal()
-		}
-
-		g.playerRoundScores = append(g.playerRoundScores, scores)
-
-		g.round++
+		g.advanceRound()
 
 		return nil
 	}
@@ -132,9 +146,9 @@ func (g *Game) TakeTurn() error {
 				return fmt.Errorf("invalid index to replace: %v", replaceIndex)
 			}
 
-			oldCard := g.playerStates[g.playerTurnIndex].board[replaceIndex].Card
+			oldCard := g.playerStates[g.currentPlayerIndex].board[replaceIndex].Card
 
-			g.playerStates[g.playerTurnIndex].board[replaceIndex] = PlayerBoardCard{
+			g.playerStates[g.currentPlayerIndex].board[replaceIndex] = PlayerBoardCard{
 				Card:   drawnCard,
 				FaceUp: true,
 			}
@@ -146,14 +160,14 @@ func (g *Game) TakeTurn() error {
 				return fmt.Errorf("invalid index to replace: %v", replaceIndex)
 			}
 
-			g.playerStates[g.playerTurnIndex].board[replaceIndex].FaceUp = true
+			g.playerStates[g.currentPlayerIndex].board[replaceIndex].FaceUp = true
 
 			g.discarded = drawnCard
 
 		case DecisionDrawnDiscardAndSkip:
 			// Enforce correctness
 			seenFaceDown := false
-			for _, c := range g.playerStates[g.playerTurnIndex].board {
+			for _, c := range g.playerStates[g.currentPlayerIndex].board {
 				if !c.FaceUp {
 					if seenFaceDown {
 						return fmt.Errorf("can only skip if one card is left face down")
@@ -176,10 +190,10 @@ func (g *Game) TakeTurn() error {
 	}
 
 	// Advance the turn
-	g.playerTurnIndex++
+	g.currentPlayerIndex++
 
-	if g.playerTurnIndex >= len(g.players) {
-		g.playerTurnIndex = 0
+	if g.currentPlayerIndex >= len(g.players) {
+		g.currentPlayerIndex = 0
 	}
 
 	return nil

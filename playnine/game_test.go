@@ -110,6 +110,12 @@ func TestNewPlayerStateIsntFinished(t *testing.T) {
 	g, err := playnine.NewGame(players)
 	assert.Nil(t, err)
 
+	assert.Len(t, g.PlayerStates(), 1)
+
+	if t.Failed() {
+		return
+	}
+
 	state := g.PlayerStates()[0]
 	assert.False(t, state.IsFinished(), "State shouldn't be finished")
 }
@@ -127,6 +133,9 @@ func TestTwoPlayersHaveDifferentStarts(t *testing.T) {
 	// being the same, but for now that's fine
 	states := g.PlayerStates()
 	assert.Len(t, states, 2)
+	if t.Failed() {
+		return
+	}
 	assert.NotElementsMatch(t, states[0].CurrentBoard(), states[1].CurrentBoard())
 }
 
@@ -138,6 +147,12 @@ func TestGetCurrentPlayerState(t *testing.T) {
 
 	g, err := playnine.NewGame(players)
 	assert.Nil(t, err)
+
+	assert.Len(t, g.PlayerStates(), 2)
+
+	if t.Failed() {
+		return
+	}
 
 	currentState := g.CurrentPlayerState()
 	currentStateByIndex := g.PlayerStates()[g.CurrentPlayerIndex()]
@@ -198,7 +213,7 @@ func TestTakingTurnAppliesTurnStrategy(t *testing.T) {
 	assert.NotElementsMatch(t, oldState, g.PlayerStates()[0].CurrentBoard(), "State didn't update, but should've")
 }
 
-func TestRoundScoresUpdateWhenRoundCompletes(t *testing.T) {
+func TestRoundAdvancesWhenAllPlayersFinish(t *testing.T) {
 	players := []playnine.Player{
 		testPlayer,
 		testPlayer,
@@ -229,4 +244,16 @@ func TestRoundScoresUpdateWhenRoundCompletes(t *testing.T) {
 	roundOneScores := scores[0]
 
 	assert.Len(t, roundOneScores, len(players), "Should have all players' scores in the round")
+
+	for i, s := range g.PlayerStates() {
+		sawFaceUp := 0
+
+		for _, c := range s.CurrentBoard() {
+			if c.FaceUp {
+				sawFaceUp++
+			}
+		}
+
+		assert.Equal(t, 2, sawFaceUp, "Player %d didn't have exactly two face up cards for the start of the next round", i+1)
+	}
 }

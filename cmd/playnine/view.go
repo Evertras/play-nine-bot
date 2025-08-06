@@ -5,11 +5,12 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
+
 	"github.com/evertras/play-nine-bot/playnine"
 )
 
 func renderPlayerBoards(game playnine.Game) string {
-
 	stringifyBoardState := func(state playnine.PlayerBoard) string {
 		var b strings.Builder
 
@@ -57,17 +58,39 @@ func renderPlayerBoards(game playnine.Game) string {
 		boards[i] = style.Render(b.String())
 	}
 
-	return lipgloss.JoinHorizontal(lipgloss.Bottom, boards...)
+	border := lipgloss.NewStyle().BorderStyle(lipgloss.NormalBorder())
+
+	return border.Render(lipgloss.JoinHorizontal(lipgloss.Bottom, boards...))
+}
+
+func renderPlayerScoreTable(game playnine.Game) string {
+	roundScores := game.PlayerRoundScores()
+
+	rows := make([][]string, len(roundScores))
+
+	for round, playerScores := range roundScores {
+		row := make([]string, len(playerScores)+1)
+
+		row[0] = fmt.Sprintf("%d ", round+1)
+		for i, score := range playerScores {
+			row[i+1] = fmt.Sprintf("%d", score)
+		}
+
+		rows[round] = row
+	}
+
+	t := table.New().Border(lipgloss.NormalBorder()).Rows(rows...)
+
+	return t.String()
 }
 
 func (m model) View() string {
 	var b strings.Builder
 
 	playerBoards := renderPlayerBoards(m.game)
+	playerScores := renderPlayerScoreTable(m.game)
 
-	border := lipgloss.NewStyle().BorderStyle(lipgloss.NormalBorder())
-
-	b.WriteString(border.Render(playerBoards))
+	b.WriteString(lipgloss.JoinVertical(lipgloss.Left, playerBoards, playerScores))
 
 	fmt.Fprintf(&b, "\n\nDiscard: %2d", m.game.AvailableDiscard())
 
