@@ -100,8 +100,8 @@ func (g *Game) advanceRound() error {
 
 	g.playerRoundScores = append(g.playerRoundScores, scores)
 
-	// TODO: advance per round, catch with test
-	g.currentPlayerIndex = 0
+	// Do this before incrementing round because round is 1-index
+	g.currentPlayerIndex = g.round % len(g.players)
 
 	g.round++
 

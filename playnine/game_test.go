@@ -256,4 +256,6 @@ func TestRoundAdvancesWhenAllPlayersFinish(t *testing.T) {
 
 		assert.Equal(t, 2, sawFaceUp, "Player %d didn't have exactly two face up cards for the start of the next round", i+1)
 	}
+
+	assert.Equal(t, 1, g.CurrentPlayerIndex(), "Should let the next player deal in the next round")
 }
