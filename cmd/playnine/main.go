@@ -19,7 +19,7 @@ func newGame() playnine.Game {
 
 	makePlayer := func(i int) playnine.Player {
 		return playnine.NewPlayer(
-			fmt.Sprintf("Player #%d", i),
+			fmt.Sprintf("Player #%d", i+1),
 			strategies.OpeningFlipsOppositeCorners,
 			strategies.FastestDrawOrUseDiscard,
 			strategies.FastestDrawn,
