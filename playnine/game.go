@@ -15,7 +15,8 @@ type Game struct {
 	playerTurnIndex int
 	finalTurn       bool
 
-	round int
+	round             int
+	playerRoundScores [][]int
 }
 
 // NewGame creates a new game with the given players ready to play.
@@ -78,9 +79,30 @@ func (g Game) AvailableDiscard() Card {
 	return g.discarded
 }
 
+// PlayerRoundScores returns the round-by-round scores of the players, filled
+// in for each round completed. The first index is the round, and the second
+// index is the player index.
+func (g Game) PlayerRoundScores() [][]int {
+	return g.playerRoundScores
+}
+
 // TakeTurn takes the turn for the current player and advances to the next player.
 func (g *Game) TakeTurn() error {
-	// Apply player strategy
+	// If the current player is done
+	if g.CurrentPlayerState().IsFinished() {
+		scores := make([]int, len(g.playerStates))
+
+		for i, p := range g.playerStates {
+			scores[i] = p.board.scoreFinal()
+		}
+
+		g.playerRoundScores = append(g.playerRoundScores, scores)
+
+		g.round++
+
+		return nil
+	}
+
 	curPlayer := g.players[g.CurrentPlayerIndex()]
 
 	drawOrUseDiscard, discardIndex, err := curPlayer.strategyTakeTurnDrawOrUseDiscard(*g)

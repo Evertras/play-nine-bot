@@ -197,3 +197,34 @@ func TestTakingTurnAppliesTurnStrategy(t *testing.T) {
 
 	assert.NotElementsMatch(t, oldState, g.PlayerStates()[0].CurrentBoard(), "State didn't update, but should've")
 }
+
+func TestRoundScoresUpdateWhenRoundCompletes(t *testing.T) {
+	players := []playnine.Player{
+		testPlayer,
+		testPlayer,
+	}
+
+	g, err := playnine.NewGame(players)
+	assert.Nil(t, err, "Failed to create new game")
+
+	const expectedTurnsToCompleteRound = 2*6 + 1
+
+	for i := range expectedTurnsToCompleteRound {
+		err = g.TakeTurn()
+		assert.Nil(t, err, "Failed to take turn on turn %d", i+1)
+	}
+
+	assert.Equal(t, 2, g.CurrentRound(), "Should be on the second round")
+
+	scores := g.PlayerRoundScores()
+
+	assert.Len(t, scores, 1, "Should have 1 round of scores")
+
+	if t.Failed() {
+		return
+	}
+
+	roundOneScores := scores[0]
+
+	assert.Len(t, roundOneScores, len(players), "Should have all players' scores in the round")
+}
