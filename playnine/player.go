@@ -47,6 +47,11 @@ func NewPlayer(name string, strategyOpeningFlips PlayerStrategyOpeningFlips, str
 	}
 }
 
+// Name gets the name of the player.
+func (p Player) Name() string {
+	return p.name
+}
+
 // CurrentBoard returns the player's current board state.
 func (p PlayerState) CurrentBoard() PlayerBoard {
 	return p.board
