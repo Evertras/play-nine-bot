@@ -14,7 +14,10 @@ type result struct {
 }
 
 func main() {
-	const numPlayers = 4
+	const (
+		numPlayers = 4
+		numRounds  = 10000
+	)
 
 	players := make([]playnine.Player, numPlayers)
 
@@ -27,7 +30,7 @@ func main() {
 		)
 	}
 
-	finalScores, err := runGame(players)
+	finalScores, err := runMany(players, numRounds)
 
 	if err != nil {
 		fmt.Println("Failed to run game:", err)
@@ -35,6 +38,7 @@ func main() {
 	}
 
 	for _, finalScore := range finalScores {
-		fmt.Println(finalScore.player.Name(), " ", finalScore.finalScore)
+		fmt.Printf("%s - %.1f - %.1f", finalScore.player.Name(), finalScore.avgScore, finalScore.avgPlacement)
+		fmt.Println()
 	}
 }

@@ -1,6 +1,9 @@
 package playnine
 
-import "fmt"
+import (
+	"fmt"
+	"sync/atomic"
+)
 
 // PlayerBoardSize is how many cards are on the player's board,
 // which are then divided into two rows.
@@ -22,11 +25,14 @@ type PlayerBoard [PlayerBoardSize]PlayerBoardCard
 // Player is a player that has some strategy to play.
 type Player struct {
 	name string
+	id   int
 
 	strategyOpeningFlips             PlayerStrategyOpeningFlips
 	strategyTakeTurnDrawOrUseDiscard PlayerStrategyTakeTurnDrawOrUseDiscard
 	strategyTakeTurnDrawn            PlayerStrategyTakeTurnDrawn
 }
+
+var idCounter atomic.Int32
 
 // PlayerState contains information for a single player in an active game.
 type PlayerState struct {
@@ -45,6 +51,7 @@ func NewPlayer(
 ) Player {
 	return Player{
 		name: name,
+		id:   int(idCounter.Add(1)),
 
 		strategyOpeningFlips:             strategyOpeningFlips,
 		strategyTakeTurnDrawOrUseDiscard: strategyTakeTurnDrawOrUseDiscard,
@@ -55,6 +62,12 @@ func NewPlayer(
 // Name gets the name of the player.
 func (p Player) Name() string {
 	return p.name
+}
+
+// ID returns an atomically incremented ID so that two
+// players with the same name can be differentiated.
+func (p Player) ID() int {
+	return p.id
 }
 
 // CurrentBoard returns the player's current board state.
