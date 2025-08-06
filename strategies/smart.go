@@ -6,8 +6,6 @@ import (
 	"github.com/evertras/play-nine-bot/playnine"
 )
 
-const rowSize = playnine.PlayerBoardSize / 2
-
 type SmartConfig struct {
 	// Defaults should be reasonably expected to be smarter
 
@@ -16,7 +14,7 @@ type SmartConfig struct {
 }
 
 // returns -1 if no index found, otherwise returns the index to replace
-func smartTryMatch(board playnine.PlayerBoard, consideredCard playnine.Card) int {
+func (cfg SmartConfig) tryMatch(board playnine.PlayerBoard, consideredCard playnine.Card) int {
 	for i, card := range board {
 		if !card.FaceUp {
 			continue
@@ -26,13 +24,7 @@ func smartTryMatch(board playnine.PlayerBoard, consideredCard playnine.Card) int
 			continue
 		}
 
-		var iMatchingCard int
-
-		if i < rowSize {
-			iMatchingCard = i + rowSize
-		} else {
-			iMatchingCard = i - rowSize
-		}
+		iMatchingCard := matchIndex(i)
 
 		// Skip if already a match
 		if board[iMatchingCard].FaceUp && board[iMatchingCard].Card == consideredCard {
@@ -45,19 +37,27 @@ func smartTryMatch(board playnine.PlayerBoard, consideredCard playnine.Card) int
 	return -1
 }
 
-// returns -1 if no inex found, otherwise returns the index to replace
-func smartTryReplaceHighest(board playnine.PlayerBoard, consideredCard playnine.Card) int {
+// returns -1 if no index found, otherwise returns the index to replace
+func (cfg SmartConfig) tryReplaceHighest(board playnine.PlayerBoard, consideredCard playnine.Card) int {
+	highestCardWithoutMatch := consideredCard
+	iHighestCardWithoutMatch := -1
 	for i, card := range board {
 		if !card.FaceUp {
 			continue
 		}
 
-		if card.Card > consideredCard {
-			return i
+		// Skip if there's a match
+		if !cfg.IgnoreMatches && hasVisibleMatchAtIndex(board, i) {
+			continue
+		}
+
+		if card.Card > highestCardWithoutMatch {
+			iHighestCardWithoutMatch = i
+			highestCardWithoutMatch = card.Card
 		}
 	}
 
-	return -1
+	return iHighestCardWithoutMatch
 }
 
 func SmartDrawOrUseDiscard(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawOrUseDiscard {
@@ -68,7 +68,7 @@ func SmartDrawOrUseDiscard(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawO
 
 		// Check if we can complete any matches, whether the other card is visible or not
 		if !cfg.IgnoreMatches {
-			iMatching := smartTryMatch(board, availDiscard)
+			iMatching := cfg.tryMatch(board, availDiscard)
 
 			if iMatching >= 0 {
 				return playnine.DecisionDrawOrUseDiscardUseDiscard, playnine.DecisionCardIndex(iMatching), nil
@@ -76,7 +76,7 @@ func SmartDrawOrUseDiscard(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawO
 		}
 
 		// Check if we can replace any of our face up cards with a lower discard
-		iReplace := smartTryReplaceHighest(board, availDiscard)
+		iReplace := cfg.tryReplaceHighest(board, availDiscard)
 
 		if iReplace >= 0 {
 			return playnine.DecisionDrawOrUseDiscardUseDiscard, playnine.DecisionCardIndex(iReplace), nil
@@ -94,7 +94,7 @@ func SmartDrawn(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawn {
 
 		// Check if we can complete any matches, whether the other card is visible or not
 		if !cfg.IgnoreMatches {
-			iMatching := smartTryMatch(board, drawnCard)
+			iMatching := cfg.tryMatch(board, drawnCard)
 
 			if iMatching >= 0 {
 				return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(iMatching), nil
@@ -102,7 +102,7 @@ func SmartDrawn(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawn {
 		}
 
 		// Check if we can replace any of our face up cards with the card we drew, ignore matches
-		iReplace := smartTryReplaceHighest(board, drawnCard)
+		iReplace := cfg.tryReplaceHighest(board, drawnCard)
 		if iReplace >= 0 {
 			return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(iReplace), nil
 		}

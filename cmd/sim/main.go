@@ -21,12 +21,14 @@ func main() {
 
 	players := make([]playnine.Player, 0, numPlayers)
 
-	players = append(players, playnine.NewPlayer(
-		"Fast",
-		strategies.OpeningFlipsOppositeCorners,
-		strategies.FastestDrawOrUseDiscard,
-		strategies.FastestDrawn,
-	))
+	/*
+		players = append(players, playnine.NewPlayer(
+			"Fast",
+			strategies.OpeningFlipsOppositeCorners,
+			strategies.FastestDrawOrUseDiscard,
+			strategies.FastestDrawn,
+		))
+	*/
 
 	players = append(players,
 		playnine.NewPlayer(
