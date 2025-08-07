@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
+	"slices"
 
 	"github.com/evertras/play-nine-bot/playnine"
 )
@@ -48,7 +50,13 @@ func runMany(players []playnine.Player, numRounds int) ([]longtermResult, error)
 
 	for range numRounds {
 		go func(players []playnine.Player) {
-			result, err := runGame(players)
+			// shuffle players for each run to avoid start position bias
+			shuffled := make([]playnine.Player, len(players))
+			copy(shuffled, players)
+			slices.SortFunc(shuffled, func(a, b playnine.Player) int {
+				return rand.Intn(2) - 1
+			})
+			result, err := runGame(shuffled)
 
 			resultChan <- gameResult{
 				result: result,

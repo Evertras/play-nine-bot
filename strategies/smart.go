@@ -10,19 +10,23 @@ type SmartConfig struct {
 	// Defaults should be reasonably expected to be smarter
 
 	// IgnoreMatches will ignore trying to complete matches.
+	//
+	// This is a terrible idea.
 	IgnoreMatches bool
 
-	// FlipOpeningMatch will flip the first two vertical cards, rather than
-	// flipping diagonal cards.
-	FlipOpeningMatch bool
+	// FlipOppositeCorners will flip opposite corners rather than
+	// going for an opening match.
+	//
+	// In testing, this is a very small but noticeable disadvantage of a few points per round.
+	FlipOppositeCorners bool
 }
 
 func (cfg SmartConfig) OpeningFlips() [2]int {
-	if cfg.FlipOpeningMatch {
-		return OpeningFlipsFirstVertical()
+	if cfg.FlipOppositeCorners {
+		return OpeningFlipsOppositeCorners()
 	}
 
-	return OpeningFlipsOppositeCorners()
+	return OpeningFlipsFirstVertical()
 }
 
 func (cfg SmartConfig) DrawOrUseDiscard(g playnine.Game) (playnine.DecisionDrawOrUseDiscard, playnine.DecisionCardIndex, error) {
