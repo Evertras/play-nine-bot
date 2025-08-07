@@ -41,27 +41,13 @@ func main() {
 
 	smartDefaultCfg := strategies.SmartConfig{}
 
-	players = append(players,
-		playnine.NewPlayer(
-			"Smart Default",
-			smartDefaultCfg.OpeningFlips,
-			smartDefaultCfg.DrawOrUseDiscard,
-			smartDefaultCfg.Drawn,
-		),
-	)
+	players = append(players, smartDefaultCfg.NewPlayer("Smart Default"))
 
 	smartCfgLab := strategies.SmartConfig{
-		ReplaceDiffThreshold: 3,
+		ReplaceDiffThreshold: 2,
 	}
 
-	players = append(players,
-		playnine.NewPlayer(
-			"Smart Lab",
-			smartCfgLab.OpeningFlips,
-			smartCfgLab.DrawOrUseDiscard,
-			smartCfgLab.Drawn,
-		),
-	)
+	players = append(players, smartCfgLab.NewPlayer("Smart Lab"))
 
 	finalScores, err := runMany(players, numRounds)
 
