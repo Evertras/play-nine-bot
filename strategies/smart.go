@@ -19,6 +19,14 @@ type SmartConfig struct {
 	//
 	// In testing, this is a small but noticeable disadvantage of a few points per round.
 	FlipFirstVertical bool
+
+	// ReplaceDiffThreshold is how big the difference must be before
+	// replacing vs flipping is considered
+	ReplaceDiffThreshold int
+}
+
+func (cfg SmartConfig) NewPlayer(name string) playnine.Player {
+	return playnine.NewPlayer(name, cfg.OpeningFlips, cfg.DrawOrUseDiscard, cfg.Drawn)
 }
 
 func (cfg SmartConfig) OpeningFlips() [2]int {
@@ -109,7 +117,7 @@ func (cfg SmartConfig) tryMatch(board playnine.PlayerBoard, consideredCard playn
 
 // returns -1 if no index found, otherwise returns the index to replace
 func (cfg SmartConfig) tryReplaceHighest(board playnine.PlayerBoard, consideredCard playnine.Card) int {
-	highestCardWithoutMatch := consideredCard
+	highestCardWithoutMatch := consideredCard - playnine.Card(cfg.ReplaceDiffThreshold)
 	iHighestCardWithoutMatch := -1
 	for i, card := range board {
 		if !card.FaceUp {

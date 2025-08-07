@@ -17,40 +17,24 @@ type model struct {
 func newGame() playnine.Game {
 	const numPlayers = 4
 
-	makeFastestPlayer := func(i int) playnine.Player {
-		return playnine.NewPlayer(
-			fmt.Sprintf("Fastest #%d", i+1),
-			strategies.OpeningFlipsOppositeCorners,
-			strategies.FastestDrawOrUseDiscard,
-			strategies.FastestDrawn,
-		)
-	}
+	players := []playnine.Player{}
 
-	makeReplacerPlayer := func(i int) playnine.Player {
-		return playnine.NewPlayer(
-			fmt.Sprintf("Replacer #%d", i+1),
+	players = append(players,
+		playnine.NewPlayer(
+			"Replacer",
 			strategies.OpeningFlipsOppositeCorners,
 			strategies.ReplaceHigherDrawOrUseDiscard,
 			strategies.ReplaceHigherDrawn,
-		)
+		),
+	)
+
+	cfgSmartDefault := strategies.SmartConfig{}
+	cfgSmartThreshold := strategies.SmartConfig{
+		ReplaceDiffThreshold: 1,
 	}
 
-	makeSmartPlayer := func(i int) playnine.Player {
-		cfg := strategies.SmartConfig{}
-		return playnine.NewPlayer(
-			fmt.Sprintf("Smart #%d", i+1),
-			cfg.OpeningFlips,
-			cfg.DrawOrUseDiscard,
-			cfg.Drawn,
-		)
-	}
-
-	players := []playnine.Player{}
-
-	players = append(players, makeFastestPlayer(0))
-	players = append(players, makeFastestPlayer(1))
-	players = append(players, makeReplacerPlayer(2))
-	players = append(players, makeSmartPlayer(3))
+	players = append(players, cfgSmartDefault.NewPlayer("Default"))
+	players = append(players, cfgSmartThreshold.NewPlayer("Threshold"))
 
 	game, err := playnine.NewGame(players)
 

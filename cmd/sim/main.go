@@ -39,29 +39,27 @@ func main() {
 		),
 	)
 
-	smartCfg := strategies.SmartConfig{
-		FlipFirstVertical: false,
-	}
+	smartDefaultCfg := strategies.SmartConfig{}
 
 	players = append(players,
 		playnine.NewPlayer(
-			"Smart Diag",
-			smartCfg.OpeningFlips,
-			smartCfg.DrawOrUseDiscard,
-			smartCfg.Drawn,
+			"Smart Default",
+			smartDefaultCfg.OpeningFlips,
+			smartDefaultCfg.DrawOrUseDiscard,
+			smartDefaultCfg.Drawn,
 		),
 	)
 
-	smartCfgStartOpposite := strategies.SmartConfig{
-		FlipFirstVertical: true,
+	smartCfgLab := strategies.SmartConfig{
+		ReplaceDiffThreshold: 3,
 	}
 
 	players = append(players,
 		playnine.NewPlayer(
-			"Smart Vert",
-			smartCfgStartOpposite.OpeningFlips,
-			smartCfgStartOpposite.DrawOrUseDiscard,
-			smartCfgStartOpposite.Drawn,
+			"Smart Lab",
+			smartCfgLab.OpeningFlips,
+			smartCfgLab.DrawOrUseDiscard,
+			smartCfgLab.Drawn,
 		),
 	)
 
