@@ -165,7 +165,10 @@ func (g *Game) TakeTurn() error {
 		}
 
 		oldCardValue := g.playerStates[g.currentPlayerIndex].board[discardIndex].Card
-		g.playerStates[g.currentPlayerIndex].board[discardIndex].Card = g.AvailableDiscard()
+		g.playerStates[g.currentPlayerIndex].board[discardIndex] = PlayerBoardCard{
+			Card:   g.AvailableDiscard(),
+			FaceUp: true,
+		}
 		g.discarded = oldCardValue
 
 	default:

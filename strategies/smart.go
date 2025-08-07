@@ -44,9 +44,7 @@ func (cfg SmartConfig) DrawOrUseDiscard(g playnine.Game) (playnine.DecisionDrawO
 
 	// Check if we can complete any matches, whether the other card is visible or not
 	if !cfg.IgnoreMatches {
-		iMatching := cfg.tryMatch(board, availDiscard)
-
-		if iMatching >= 0 {
+		if iMatching := cfg.tryMatch(board, availDiscard); iMatching >= 0 {
 			return playnine.DecisionDrawOrUseDiscardUseDiscard, playnine.DecisionCardIndex(iMatching), nil
 		}
 	}
@@ -114,7 +112,7 @@ func (cfg SmartConfig) tryMatch(board playnine.PlayerBoard, consideredCard playn
 
 // returns -1 if no index found, otherwise returns the index to replace
 func (cfg SmartConfig) tryReplaceHighest(board playnine.PlayerBoard, consideredCard playnine.Card) int {
-	highestCardWithoutMatch := consideredCard - playnine.Card(cfg.ReplaceDiffThreshold)
+	highestCardWithoutMatch := consideredCard + playnine.Card(cfg.ReplaceDiffThreshold-1)
 	iHighestCardWithoutMatch := -1
 	for i, card := range board {
 		if !card.FaceUp {

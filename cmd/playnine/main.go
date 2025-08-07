@@ -19,18 +19,20 @@ func newGame() playnine.Game {
 
 	players := []playnine.Player{}
 
-	players = append(players,
-		playnine.NewPlayer(
-			"Replacer",
-			strategies.OpeningFlipsOppositeCorners,
-			strategies.ReplaceHigherDrawOrUseDiscard,
-			strategies.ReplaceHigherDrawn,
-		),
-	)
+	/*
+		players = append(players,
+			playnine.NewPlayer(
+				"Replacer",
+				strategies.OpeningFlipsOppositeCorners,
+				strategies.ReplaceHigherDrawOrUseDiscard,
+				strategies.ReplaceHigherDrawn,
+			),
+		)
+	*/
 
 	cfgSmartDefault := strategies.SmartConfig{}
 	cfgSmartThreshold := strategies.SmartConfig{
-		ReplaceDiffThreshold: 1,
+		ReplaceDiffThreshold: 5,
 	}
 
 	players = append(players, cfgSmartDefault.NewPlayer("Default"))
