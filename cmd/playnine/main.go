@@ -31,9 +31,9 @@ func newGame() playnine.Game {
 	*/
 
 	cfgSmartDefault := strategies.NewSmartConfig()
-	cfgSmartLab := strategies.NewSmartConfig()
 
-	cfgSmartLab.FlipForMatches = true
+	cfgSmartLab := strategies.NewSmartConfig()
+	cfgSmartLab.FinalVisibleScoreThreshold = 0
 
 	players = append(players, cfgSmartDefault.NewPlayer("Default"))
 	players = append(players, cfgSmartLab.NewPlayer("Lab"))

@@ -148,7 +148,7 @@ func (g *Game) TakeTurn() error {
 			for _, c := range g.playerStates[g.currentPlayerIndex].board {
 				if !c.FaceUp {
 					if seenFaceDown {
-						return fmt.Errorf("can only skip if one card is left face down")
+						return fmt.Errorf("can only skip if exactly one card is left face down")
 					}
 
 					seenFaceDown = true

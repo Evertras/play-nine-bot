@@ -30,8 +30,7 @@ type SmartConfig struct {
 
 	// FinalVisibleScoreThreshold is how low our visible score has to be before we
 	// decide to flip our last card.
-	// TODO
-	//FinalVisibleScoreThreshold int
+	FinalVisibleScoreThreshold int
 
 	// FlipForMatches will try and flip fresh cards when discarding the drawn card
 	// that may complete a match, or more likely gives us information about how
@@ -46,6 +45,9 @@ type SmartConfig struct {
 func NewSmartConfig() SmartConfig {
 	return SmartConfig{
 		ReplaceDiffThreshold: 6,
+
+		// Set high to mostly ignore it by default
+		FinalVisibleScoreThreshold: 200,
 	}
 }
 
@@ -98,6 +100,27 @@ func (cfg SmartConfig) Drawn(g playnine.Game, drawnCard playnine.Card) (playnine
 	// Check if we can replace any of our face up cards with the card we drew, ignore matches
 	if iReplace := cfg.tryReplaceHighest(board, drawnCard); iReplace >= 0 {
 		return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(iReplace), nil
+	}
+
+	scoreVisible := board.ScoreVisible()
+
+	if scoreVisible > cfg.FinalVisibleScoreThreshold {
+		// Check if we need to wait
+		seenFaceDown := 0
+
+		for _, card := range board {
+			if !card.FaceUp {
+				seenFaceDown++
+			}
+
+			if seenFaceDown > 1 {
+				break
+			}
+		}
+
+		if seenFaceDown == 1 {
+			return playnine.DecisionDrawnDiscardAndSkip, 0, nil
+		}
 	}
 
 	if cfg.FlipForMatches {
