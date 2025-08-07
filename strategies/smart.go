@@ -11,6 +11,10 @@ type SmartConfig struct {
 
 	// IgnoreMatches will ignore trying to complete matches.
 	IgnoreMatches bool
+
+	// FlipOpeningMatch will flip the first two vertical cards, rather than
+	// flipping diagonal cards.
+	FlipOpeningMatch bool
 }
 
 // returns -1 if no index found, otherwise returns the index to replace
@@ -60,60 +64,56 @@ func (cfg SmartConfig) tryReplaceHighest(board playnine.PlayerBoard, consideredC
 	return iHighestCardWithoutMatch
 }
 
-func SmartDrawOrUseDiscard(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawOrUseDiscard {
-	return func(g playnine.Game) (playnine.DecisionDrawOrUseDiscard, playnine.DecisionCardIndex, error) {
-		state := g.CurrentPlayerState()
-		board := state.CurrentBoard()
-		availDiscard := g.AvailableDiscard()
+func (cfg SmartConfig) SmartDrawOrUseDiscard(g playnine.Game) (playnine.DecisionDrawOrUseDiscard, playnine.DecisionCardIndex, error) {
+	state := g.CurrentPlayerState()
+	board := state.CurrentBoard()
+	availDiscard := g.AvailableDiscard()
 
-		// Check if we can complete any matches, whether the other card is visible or not
-		if !cfg.IgnoreMatches {
-			iMatching := cfg.tryMatch(board, availDiscard)
+	// Check if we can complete any matches, whether the other card is visible or not
+	if !cfg.IgnoreMatches {
+		iMatching := cfg.tryMatch(board, availDiscard)
 
-			if iMatching >= 0 {
-				return playnine.DecisionDrawOrUseDiscardUseDiscard, playnine.DecisionCardIndex(iMatching), nil
-			}
+		if iMatching >= 0 {
+			return playnine.DecisionDrawOrUseDiscardUseDiscard, playnine.DecisionCardIndex(iMatching), nil
 		}
-
-		// Check if we can replace any of our face up cards with a lower discard
-		iReplace := cfg.tryReplaceHighest(board, availDiscard)
-
-		if iReplace >= 0 {
-			return playnine.DecisionDrawOrUseDiscardUseDiscard, playnine.DecisionCardIndex(iReplace), nil
-		}
-
-		// If the discarded card isn't lower than anything we have, then try our luck with draw
-		return playnine.DecisionDrawOrUseDiscardDraw, 0, nil
 	}
+
+	// Check if we can replace any of our face up cards with a lower discard
+	iReplace := cfg.tryReplaceHighest(board, availDiscard)
+
+	if iReplace >= 0 {
+		return playnine.DecisionDrawOrUseDiscardUseDiscard, playnine.DecisionCardIndex(iReplace), nil
+	}
+
+	// If the discarded card isn't lower than anything we have, then try our luck with draw
+	return playnine.DecisionDrawOrUseDiscardDraw, 0, nil
 }
 
-func SmartDrawn(cfg SmartConfig) playnine.PlayerStrategyTakeTurnDrawn {
-	return func(g playnine.Game, drawnCard playnine.Card) (playnine.DecisionDrawn, playnine.DecisionCardIndex, error) {
-		state := g.CurrentPlayerState()
-		board := state.CurrentBoard()
+func (cfg SmartConfig) SmartDrawn(g playnine.Game, drawnCard playnine.Card) (playnine.DecisionDrawn, playnine.DecisionCardIndex, error) {
+	state := g.CurrentPlayerState()
+	board := state.CurrentBoard()
 
-		// Check if we can complete any matches, whether the other card is visible or not
-		if !cfg.IgnoreMatches {
-			iMatching := cfg.tryMatch(board, drawnCard)
+	// Check if we can complete any matches, whether the other card is visible or not
+	if !cfg.IgnoreMatches {
+		iMatching := cfg.tryMatch(board, drawnCard)
 
-			if iMatching >= 0 {
-				return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(iMatching), nil
-			}
+		if iMatching >= 0 {
+			return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(iMatching), nil
 		}
-
-		// Check if we can replace any of our face up cards with the card we drew, ignore matches
-		iReplace := cfg.tryReplaceHighest(board, drawnCard)
-		if iReplace >= 0 {
-			return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(iReplace), nil
-		}
-
-		// Flip whatever the first face down card is
-		for i, card := range state.CurrentBoard() {
-			if !card.FaceUp {
-				return playnine.DecisionDrawnDiscardAndFlip, playnine.DecisionCardIndex(i), nil
-			}
-		}
-
-		return 0, 0, fmt.Errorf("didn't find a face down card to flip")
 	}
+
+	// Check if we can replace any of our face up cards with the card we drew, ignore matches
+	iReplace := cfg.tryReplaceHighest(board, drawnCard)
+	if iReplace >= 0 {
+		return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(iReplace), nil
+	}
+
+	// Flip whatever the first face down card is
+	for i, card := range state.CurrentBoard() {
+		if !card.FaceUp {
+			return playnine.DecisionDrawnDiscardAndFlip, playnine.DecisionCardIndex(i), nil
+		}
+	}
+
+	return 0, 0, fmt.Errorf("didn't find a face down card to flip")
 }
