@@ -16,7 +16,7 @@ type result struct {
 func main() {
 	const (
 		numPlayers = 4
-		numRounds  = 10000
+		numRounds  = 100000
 	)
 
 	players := make([]playnine.Player, 0, numPlayers)
@@ -39,27 +39,29 @@ func main() {
 		),
 	)
 
-	smartCfg := strategies.SmartConfig{}
+	smartCfg := strategies.SmartConfig{
+		FlipFirstVertical: false,
+	}
 
 	players = append(players,
 		playnine.NewPlayer(
-			"Smart",
+			"Smart Diag",
 			smartCfg.OpeningFlips,
 			smartCfg.DrawOrUseDiscard,
 			smartCfg.Drawn,
 		),
 	)
 
-	smartCfgStartMatch := strategies.SmartConfig{
-		FlipOpeningMatch: true,
+	smartCfgStartOpposite := strategies.SmartConfig{
+		FlipFirstVertical: true,
 	}
 
 	players = append(players,
 		playnine.NewPlayer(
-			"Smart V",
-			smartCfgStartMatch.OpeningFlips,
-			smartCfgStartMatch.DrawOrUseDiscard,
-			smartCfgStartMatch.Drawn,
+			"Smart Vert",
+			smartCfgStartOpposite.OpeningFlips,
+			smartCfgStartOpposite.DrawOrUseDiscard,
+			smartCfgStartOpposite.Drawn,
 		),
 	)
 
