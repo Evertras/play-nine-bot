@@ -40,8 +40,8 @@ func newGame() playnine.Game {
 		return playnine.NewPlayer(
 			fmt.Sprintf("Smart #%d", i+1),
 			strategies.OpeningFlipsOppositeCorners,
-			cfg.SmartDrawOrUseDiscard,
-			cfg.SmartDrawn,
+			cfg.DrawOrUseDiscard,
+			cfg.Drawn,
 		)
 	}
 

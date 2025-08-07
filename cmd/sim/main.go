@@ -45,8 +45,8 @@ func main() {
 		playnine.NewPlayer(
 			"Smart",
 			strategies.OpeningFlipsOppositeCorners,
-			smartCfg.SmartDrawOrUseDiscard,
-			smartCfg.SmartDrawn,
+			smartCfg.DrawOrUseDiscard,
+			smartCfg.Drawn,
 		),
 	)
 	finalScores, err := runMany(players, numRounds)

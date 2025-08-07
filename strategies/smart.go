@@ -64,7 +64,7 @@ func (cfg SmartConfig) tryReplaceHighest(board playnine.PlayerBoard, consideredC
 	return iHighestCardWithoutMatch
 }
 
-func (cfg SmartConfig) SmartDrawOrUseDiscard(g playnine.Game) (playnine.DecisionDrawOrUseDiscard, playnine.DecisionCardIndex, error) {
+func (cfg SmartConfig) DrawOrUseDiscard(g playnine.Game) (playnine.DecisionDrawOrUseDiscard, playnine.DecisionCardIndex, error) {
 	state := g.CurrentPlayerState()
 	board := state.CurrentBoard()
 	availDiscard := g.AvailableDiscard()
@@ -89,7 +89,7 @@ func (cfg SmartConfig) SmartDrawOrUseDiscard(g playnine.Game) (playnine.Decision
 	return playnine.DecisionDrawOrUseDiscardDraw, 0, nil
 }
 
-func (cfg SmartConfig) SmartDrawn(g playnine.Game, drawnCard playnine.Card) (playnine.DecisionDrawn, playnine.DecisionCardIndex, error) {
+func (cfg SmartConfig) Drawn(g playnine.Game, drawnCard playnine.Card) (playnine.DecisionDrawn, playnine.DecisionCardIndex, error) {
 	state := g.CurrentPlayerState()
 	board := state.CurrentBoard()
 
