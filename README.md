@@ -27,3 +27,8 @@ If take from discard:
 There are a bunch of tests in here that are technically flakey because they're
 checking for randomness in seeds that change on each run. I'm being a little
 lazy about passing custom seeds around and priming tests better that way.
+
+## Random fun findings
+
+The best threshold for replacing a face up card seems to be around 6. This may
+change depending on game state in the future, untested.
