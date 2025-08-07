@@ -46,7 +46,6 @@ type SmartConfig struct {
 func NewSmartConfig() SmartConfig {
 	return SmartConfig{
 		ReplaceDiffThreshold: 6,
-		FlipForMatches:       false,
 	}
 }
 
