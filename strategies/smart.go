@@ -52,9 +52,7 @@ func (cfg SmartConfig) DrawOrUseDiscard(g playnine.Game) (playnine.DecisionDrawO
 	}
 
 	// Check if we can replace any of our face up cards with a lower discard
-	iReplace := cfg.tryReplaceHighest(board, availDiscard)
-
-	if iReplace >= 0 {
+	if iReplace := cfg.tryReplaceHighest(board, availDiscard); iReplace >= 0 {
 		return playnine.DecisionDrawOrUseDiscardUseDiscard, playnine.DecisionCardIndex(iReplace), nil
 	}
 
@@ -76,8 +74,7 @@ func (cfg SmartConfig) Drawn(g playnine.Game, drawnCard playnine.Card) (playnine
 	}
 
 	// Check if we can replace any of our face up cards with the card we drew, ignore matches
-	iReplace := cfg.tryReplaceHighest(board, drawnCard)
-	if iReplace >= 0 {
+	if iReplace := cfg.tryReplaceHighest(board, drawnCard); iReplace >= 0 {
 		return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(iReplace), nil
 	}
 
