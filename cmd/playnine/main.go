@@ -30,13 +30,13 @@ func newGame() playnine.Game {
 		)
 	*/
 
-	cfgSmartDefault := strategies.SmartConfig{}
-	cfgSmartThreshold := strategies.SmartConfig{
-		ReplaceDiffThreshold: 5,
-	}
+	cfgSmartDefault := strategies.NewSmartConfig()
+	cfgSmartLab := strategies.NewSmartConfig()
+
+	cfgSmartLab.FlipForMatches = true
 
 	players = append(players, cfgSmartDefault.NewPlayer("Default"))
-	players = append(players, cfgSmartThreshold.NewPlayer("Threshold"))
+	players = append(players, cfgSmartLab.NewPlayer("Lab"))
 
 	game, err := playnine.NewGame(players)
 

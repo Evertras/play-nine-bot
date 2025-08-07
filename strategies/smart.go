@@ -21,8 +21,33 @@ type SmartConfig struct {
 	FlipFirstVertical bool
 
 	// ReplaceDiffThreshold is how big the difference must be before
-	// replacing vs flipping is considered
+	// replacing vs flipping is considered.
+	//
+	// 5-6 seems to be the sweet spot in initial testing, but this is hard
+	// to set as the default for now and that number may change as the
+	// strategy changes overall.
 	ReplaceDiffThreshold int
+
+	// FinalVisibleScoreThreshold is how low our visible score has to be before we
+	// decide to flip our last card.
+	// TODO
+	//FinalVisibleScoreThreshold int
+
+	// FlipForMatches will try and flip fresh cards when discarding the drawn card
+	// that may complete a match, or more likely gives us information about how
+	// to complete the match.
+	//
+	// Seems to make things worse.
+	FlipForMatches bool
+}
+
+// NewSmartConfig returns a new smart config with defaults that seem to be
+// optimal from testing.
+func NewSmartConfig() SmartConfig {
+	return SmartConfig{
+		ReplaceDiffThreshold: 6,
+		FlipForMatches:       false,
+	}
 }
 
 func (cfg SmartConfig) NewPlayer(name string) playnine.Player {
@@ -76,8 +101,17 @@ func (cfg SmartConfig) Drawn(g playnine.Game, drawnCard playnine.Card) (playnine
 		return playnine.DecisionDrawnReplaceCard, playnine.DecisionCardIndex(iReplace), nil
 	}
 
+	if cfg.FlipForMatches {
+		// Flip if the card that might be its match is already flipped
+		for i, card := range board {
+			if !card.FaceUp && board[matchIndex(i)].FaceUp {
+				return playnine.DecisionDrawnDiscardAndFlip, playnine.DecisionCardIndex(i), nil
+			}
+		}
+	}
+
 	// Flip whatever the first face down card is
-	for i, card := range state.CurrentBoard() {
+	for i, card := range board {
 		if !card.FaceUp {
 			return playnine.DecisionDrawnDiscardAndFlip, playnine.DecisionCardIndex(i), nil
 		}

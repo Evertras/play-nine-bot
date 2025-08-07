@@ -39,21 +39,15 @@ func main() {
 		),
 	)
 
-	smartDefaultCfg := strategies.SmartConfig{}
+	smartDefaultCfg := strategies.NewSmartConfig()
 
 	players = append(players, smartDefaultCfg.NewPlayer("Smart Default"))
 
-	smartCfgLab := strategies.SmartConfig{
-		ReplaceDiffThreshold: 5,
-	}
+	smartCfgLab := strategies.NewSmartConfig()
+
+	smartCfgLab.FlipForMatches = true
 
 	players = append(players, smartCfgLab.NewPlayer("Smart Lab"))
-
-	smartCfgExtreme := strategies.SmartConfig{
-		ReplaceDiffThreshold: 6,
-	}
-
-	players = append(players, smartCfgExtreme.NewPlayer("Smart Extreme"))
 
 	finalScores, err := runMany(players, numRounds)
 
