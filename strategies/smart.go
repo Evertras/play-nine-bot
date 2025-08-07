@@ -112,7 +112,11 @@ func (cfg SmartConfig) tryMatch(board playnine.PlayerBoard, consideredCard playn
 
 // returns -1 if no index found, otherwise returns the index to replace
 func (cfg SmartConfig) tryReplaceHighest(board playnine.PlayerBoard, consideredCard playnine.Card) int {
-	highestCardWithoutMatch := consideredCard + playnine.Card(cfg.ReplaceDiffThreshold-1)
+	delta := cfg.ReplaceDiffThreshold
+	if delta <= 0 {
+		delta = 1
+	}
+	highestCardWithoutMatch := consideredCard + playnine.Card(delta-1)
 	iHighestCardWithoutMatch := -1
 	for i, card := range board {
 		if !card.FaceUp {
