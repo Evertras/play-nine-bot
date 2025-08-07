@@ -39,7 +39,7 @@ func newGame() playnine.Game {
 		cfg := strategies.SmartConfig{}
 		return playnine.NewPlayer(
 			fmt.Sprintf("Smart #%d", i+1),
-			strategies.OpeningFlipsOppositeCorners,
+			cfg.OpeningFlips,
 			cfg.DrawOrUseDiscard,
 			cfg.Drawn,
 		)

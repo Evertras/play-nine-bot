@@ -17,6 +17,14 @@ type SmartConfig struct {
 	FlipOpeningMatch bool
 }
 
+func (cfg SmartConfig) OpeningFlips() [2]int {
+	if cfg.FlipOpeningMatch {
+		return OpeningFlipsFirstVertical()
+	}
+
+	return OpeningFlipsOppositeCorners()
+}
+
 func (cfg SmartConfig) DrawOrUseDiscard(g playnine.Game) (playnine.DecisionDrawOrUseDiscard, playnine.DecisionCardIndex, error) {
 	state := g.CurrentPlayerState()
 	board := state.CurrentBoard()

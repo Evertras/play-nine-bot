@@ -44,11 +44,25 @@ func main() {
 	players = append(players,
 		playnine.NewPlayer(
 			"Smart",
-			strategies.OpeningFlipsOppositeCorners,
+			smartCfg.OpeningFlips,
 			smartCfg.DrawOrUseDiscard,
 			smartCfg.Drawn,
 		),
 	)
+
+	smartCfgStartMatch := strategies.SmartConfig{
+		FlipOpeningMatch: true,
+	}
+
+	players = append(players,
+		playnine.NewPlayer(
+			"Smart V",
+			smartCfgStartMatch.OpeningFlips,
+			smartCfgStartMatch.DrawOrUseDiscard,
+			smartCfgStartMatch.Drawn,
+		),
+	)
+
 	finalScores, err := runMany(players, numRounds)
 
 	if err != nil {
