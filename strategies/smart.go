@@ -17,53 +17,6 @@ type SmartConfig struct {
 	FlipOpeningMatch bool
 }
 
-// returns -1 if no index found, otherwise returns the index to replace
-func (cfg SmartConfig) tryMatch(board playnine.PlayerBoard, consideredCard playnine.Card) int {
-	for i, card := range board {
-		if !card.FaceUp {
-			continue
-		}
-
-		if card.Card != consideredCard {
-			continue
-		}
-
-		iMatchingCard := matchIndex(i)
-
-		// Skip if already a match
-		if board[iMatchingCard].FaceUp && board[iMatchingCard].Card == consideredCard {
-			continue
-		}
-
-		return iMatchingCard
-	}
-
-	return -1
-}
-
-// returns -1 if no index found, otherwise returns the index to replace
-func (cfg SmartConfig) tryReplaceHighest(board playnine.PlayerBoard, consideredCard playnine.Card) int {
-	highestCardWithoutMatch := consideredCard
-	iHighestCardWithoutMatch := -1
-	for i, card := range board {
-		if !card.FaceUp {
-			continue
-		}
-
-		// Skip if there's a match
-		if !cfg.IgnoreMatches && hasVisibleMatchAtIndex(board, i) {
-			continue
-		}
-
-		if card.Card > highestCardWithoutMatch {
-			iHighestCardWithoutMatch = i
-			highestCardWithoutMatch = card.Card
-		}
-	}
-
-	return iHighestCardWithoutMatch
-}
-
 func (cfg SmartConfig) DrawOrUseDiscard(g playnine.Game) (playnine.DecisionDrawOrUseDiscard, playnine.DecisionCardIndex, error) {
 	state := g.CurrentPlayerState()
 	board := state.CurrentBoard()
@@ -116,4 +69,51 @@ func (cfg SmartConfig) Drawn(g playnine.Game, drawnCard playnine.Card) (playnine
 	}
 
 	return 0, 0, fmt.Errorf("didn't find a face down card to flip")
+}
+
+// returns -1 if no index found, otherwise returns the index to replace
+func (cfg SmartConfig) tryMatch(board playnine.PlayerBoard, consideredCard playnine.Card) int {
+	for i, card := range board {
+		if !card.FaceUp {
+			continue
+		}
+
+		if card.Card != consideredCard {
+			continue
+		}
+
+		iMatchingCard := matchIndex(i)
+
+		// Skip if already a match
+		if board[iMatchingCard].FaceUp && board[iMatchingCard].Card == consideredCard {
+			continue
+		}
+
+		return iMatchingCard
+	}
+
+	return -1
+}
+
+// returns -1 if no index found, otherwise returns the index to replace
+func (cfg SmartConfig) tryReplaceHighest(board playnine.PlayerBoard, consideredCard playnine.Card) int {
+	highestCardWithoutMatch := consideredCard
+	iHighestCardWithoutMatch := -1
+	for i, card := range board {
+		if !card.FaceUp {
+			continue
+		}
+
+		// Skip if there's a match
+		if !cfg.IgnoreMatches && hasVisibleMatchAtIndex(board, i) {
+			continue
+		}
+
+		if card.Card > highestCardWithoutMatch {
+			iHighestCardWithoutMatch = i
+			highestCardWithoutMatch = card.Card
+		}
+	}
+
+	return iHighestCardWithoutMatch
 }
